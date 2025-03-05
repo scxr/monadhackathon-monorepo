@@ -4,7 +4,7 @@ import config from "./config.json";
 import { monadTestnet } from "viem/chains";
 
 const AMOUNT_PER_WALLET = parseEther("0.25");
-const PARENT_PK = "0x94d6a2234abb3c9f4c826eece235cd876dfb97095962681bfb040008b309a1b1";
+const PARENT_PK = "";
 
 const parentAccount = privateKeyToAccount(PARENT_PK);
 
