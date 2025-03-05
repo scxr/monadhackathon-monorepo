@@ -1,0 +1,59 @@
+.button {
+  width: 16rem;
+  padding: 0.75rem;
+  background: #3b82f6;
+  color: white;
+  font-weight: bold;
+  border-radius: 9999px;
+  transition: background-color 0.2s;
+  font-size: 1.125rem;
+  border: none;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: #2563eb;
+}
+
+.userSection {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #111827;
+  padding: 1rem;
+  border-radius: 0.75rem;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 0.875rem;
+  color: #9ca3af;
+}
+
+.address {
+  font-family: monospace;
+  font-size: 0.875rem;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.signOutButton {
+  padding: 0.5rem 1rem;
+  background: #ef4444;
+  color: white;
+  border-radius: 9999px;
+  transition: background-color 0.2s;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+}
+
+.signOutButton:hover {
+  background: #dc2626;
+} 

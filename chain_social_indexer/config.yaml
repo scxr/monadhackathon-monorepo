@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=./node_modules/envio/evm.schema.json
+name: chain_social_indexer
+networks:
+- id: 10143
+  start_block: 0
+  contracts:
+  - name: ChainSocial
+    address:
+    - 0xB42497ACe9f353DADD5A8EF2f2Cb58176C465A95
+    handler: ./src/EventHandlers.js
+    events:
+    - event: CommentAdded(uint256 indexed commentId, uint256 indexed postId, address indexed author, string content)
+    - event: Followed(address indexed follower, address indexed followed)
+    - event: PostCreated(uint256 indexed postId, address indexed author, string content)
+    - event: PostLiked(uint256 indexed postId, address indexed liker)
+    - event: Unfollowed(address indexed follower, address indexed followed)
+    - event: UserCreated(address indexed userAddress, string username)

@@ -1,0 +1,769 @@
+.twitterLayout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #000;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* Header */
+.header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #2f3336;
+  text-align: center;
+}
+
+.logo {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #1DA1F2;
+  margin: 0;
+}
+
+/* Main Container */
+.mainContainer {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+}
+
+/* Left Column - Home and Feed */
+.leftColumn {
+  width: 600px;
+  border-right: 1px solid #2f3336;
+  border-left: 1px solid #2f3336;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.homeLabel {
+  padding: 16px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  border-bottom: 1px solid #2f3336;
+}
+
+.userInputArea {
+  display: flex;
+  padding: 16px;
+  border-bottom: 1px solid #2f3336;
+}
+
+.userAvatar {
+  margin-right: 12px;
+}
+
+.userAvatar img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.inputWrapper {
+  flex: 1;
+}
+
+.inputWrapper textarea {
+  width: 100%;
+  border: none;
+  resize: none;
+  font-size: 1.2rem;
+  padding: 12px 0;
+  min-height: 80px;
+  outline: none;
+  font-family: inherit;
+  background-color: transparent;
+  color: #fff;
+}
+
+.inputWrapper textarea::placeholder {
+  color: #71767b;
+}
+
+.inputActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #2f3336;
+  padding-top: 12px;
+}
+
+.mediaButtons {
+  display: flex;
+}
+
+.mediaButtons button {
+  background: none;
+  border: none;
+  color: #1DA1F2;
+  font-size: 1.2rem;
+  margin-right: 12px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.mediaButtons button:hover {
+  background-color: rgba(29, 161, 242, 0.1);
+}
+
+.postButton {
+  background-color: #1DA1F2;
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  padding: 8px 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.postButton:hover {
+  background-color: #1a91da;
+}
+
+.postButton:disabled {
+  background-color: #1a5a82;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Feed */
+.feed {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.post {
+  display: flex;
+  padding: 16px;
+  border-bottom: 1px solid #2f3336;
+  transition: background-color 0.2s;
+}
+
+.post:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.postAvatar {
+  margin-right: 12px;
+}
+
+.postAvatar img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.postContent {
+  flex: 1;
+}
+
+.postHeader {
+  margin-bottom: 4px;
+}
+
+.postUsername {
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+.postHandle, .postTime {
+  color: #71767b;
+  font-size: 0.9rem;
+}
+
+.postText {
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.postActions {
+  display: flex;
+  justify-content: space-between;
+  max-width: 425px;
+}
+
+.postActions button {
+  background: none;
+  border: none;
+  color: #71767b;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.postActions button svg {
+  margin-right: 4px;
+}
+
+.postActions button:nth-child(1):hover {
+  color: #1DA1F2;
+}
+
+.postActions button:nth-child(2):hover {
+  color: #00BA7C;
+}
+
+.postActions button:nth-child(3):hover {
+  color: #F91880;
+}
+
+.postActions button:nth-child(4):hover {
+  color: #1DA1F2;
+}
+
+/* User Info Box */
+.userInfoBox {
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 16px;
+  background-color: #15181c;
+  display: flex;
+  flex-direction: column;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.userName {
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.userAddress {
+  color: #71767b;
+  font-size: 0.85rem;
+}
+
+.signOutButton {
+  background-color: #f4212e;
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+/* Right Column - Navigation */
+.rightColumn {
+  width: 275px;
+  padding: 0 16px;
+}
+
+.mainNav {
+  margin-top: 16px;
+}
+
+.mainNav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mainNav li {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  border-radius: 9999px;
+  font-size: 1.1rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.mainNav li:hover {
+  background-color: rgba(239, 243, 244, 0.1);
+}
+
+.mainNav li.active {
+  font-weight: 700;
+}
+
+.mainNav li svg {
+  margin-right: 16px;
+  font-size: 1.3rem;
+}
+
+.postButtonLarge {
+  margin-top: 16px;
+}
+
+.postButtonLarge button {
+  background-color: #1DA1F2;
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  padding: 12px 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.postButtonLarge button:hover {
+  background-color: #1a91da;
+}
+
+.container {
+  min-height: 100vh;
+  background: #000;
+  color: white;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background: rgba(17, 24, 39, 0.8);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  background: linear-gradient(to right, #60a5fa, #9333ea);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.welcomeCard {
+  background: linear-gradient(135deg, #1e40af, #3730a3);
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.welcomeTitle {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.welcomeText {
+  color: #e5e7eb;
+  font-size: 1.1rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background: #111827;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.card:hover {
+  background: #1f2937;
+  transform: translateY(-2px);
+}
+
+.card h3 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 0.75rem;
+}
+
+.card p {
+  color: #9ca3af;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .main {
+    padding: 1rem;
+  }
+
+  .welcomeCard {
+    padding: 1.5rem;
+  }
+
+  .welcomeTitle {
+    font-size: 1.5rem;
+  }
+}
+
+/* Left Sidebar */
+.leftSidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  border-right: 1px solid #2f3336;
+  position: sticky;
+  top: 0;
+  padding: 0 12px;
+}
+
+.sidebarHeader {
+  padding: 12px 16px;
+  margin-bottom: 8px;
+}
+
+.logo {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #1DA1F2;
+  margin: 0;
+}
+
+.sidebarNav {
+  flex: 1;
+}
+
+.sidebarNav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebarNav li {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  margin-bottom: 4px;
+  border-radius: 9999px;
+  font-size: 1.1rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.sidebarNav li:hover {
+  background-color: rgba(239, 243, 244, 0.1);
+}
+
+.sidebarNav li.active {
+  font-weight: 700;
+}
+
+.sidebarNav li svg {
+  margin-right: 16px;
+  font-size: 1.3rem;
+}
+
+.postButtonContainer {
+  margin: 8px 0 16px;
+  padding: 0 16px;
+}
+
+.postButton {
+  background-color: #1DA1F2;
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  padding: 12px 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.postButton:hover {
+  background-color: #1a91da;
+}
+
+.userInfo {
+  margin-top: auto;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  background-color: #15181c;
+  display: flex;
+  flex-direction: column;
+}
+
+.userName {
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 2px;
+}
+
+.userAddress {
+  color: #71767b;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+}
+
+.signOutButton {
+  background-color: #f4212e;
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  align-self: flex-end;
+  margin-top: 8px;
+}
+
+/* Main Content */
+.mainContent {
+  min-height: 100vh;
+  max-width: 600px;
+  border-right: 1px solid #2f3336;
+}
+
+.mainHeader {
+  padding: 16px;
+  border-bottom: 1px solid #2f3336;
+  position: sticky;
+  top: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(12px);
+  z-index: 10;
+}
+
+.mainHeader h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Post Box */
+.postBox {
+  display: flex;
+  padding: 16px;
+  border-bottom: 1px solid #2f3336;
+}
+
+.postBoxAvatar {
+  margin-right: 12px;
+}
+
+.postBoxAvatar img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.postBoxContent {
+  flex: 1;
+}
+
+.postBoxContent textarea {
+  width: 100%;
+  border: none;
+  resize: none;
+  font-size: 1.2rem;
+  margin-bottom: 12px;
+  padding: 12px 0;
+  min-height: 80px;
+  outline: none;
+  font-family: inherit;
+  background-color: transparent;
+  color: #fff;
+}
+
+.postBoxContent textarea::placeholder {
+  color: #71767b;
+}
+
+.postBoxActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #2f3336;
+  padding-top: 12px;
+}
+
+.postBoxIcons {
+  display: flex;
+}
+
+.postBoxIcons button {
+  background: none;
+  border: none;
+  color: #1DA1F2;
+  font-size: 1.2rem;
+  margin-right: 12px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.postBoxIcons button:hover {
+  background-color: rgba(29, 161, 242, 0.1);
+}
+
+.postSubmitButton {
+  background-color: #1DA1F2;
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  padding: 8px 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.postSubmitButton:hover {
+  background-color: #1a91da;
+}
+
+.postSubmitButton:disabled {
+  background-color: #1a5a82;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .twitterLayout {
+    grid-template-columns: 88px 1fr;
+  }
+  
+  .sidebarNav li span {
+    display: none;
+  }
+  
+  .sidebarNav li svg {
+    margin-right: 0;
+  }
+  
+  .leftSidebar {
+    align-items: center;
+  }
+  
+  .logo {
+    display: none;
+  }
+  
+  .userInfo {
+    display: none;
+  }
+}
+
+@media (max-width: 500px) {
+  .twitterLayout {
+    grid-template-columns: 1fr;
+  }
+  
+  .leftSidebar {
+    display: none;
+  }
+}
+
+/* Wallet actions styling */
+.walletActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  border-radius: 9999px;
+  background-color: #15181c;
+  margin-top: auto;
+  width: 100%;
+}
+
+.walletAddress {
+  font-size: 0.9rem;
+  color: #fff;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+
+/* Keep original container styles for compatibility */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1DA1F2;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.welcomeCard {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.welcomeTitle {
+  margin-top: 0;
+  color: #333;
+}
+
+.welcomeText {
+  color: #666;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Remove the userInfoFooter since we moved it */
+.userInfoFooter {
+  display: none;
+} 

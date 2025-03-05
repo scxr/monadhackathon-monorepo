@@ -1,0 +1,46 @@
+{
+  "wallets": [
+    {
+      "address": "0xC7A0c405DF55943E37d76B1E3c67FdD6518b26f3",
+      "private_key": "0dfd456b8f0ebb0cef0f39f2a1e82f5df5f1e89802db6d50ea6b80fd804a2da8"
+    },
+    {
+      "address": "0x9A54a612e01303aC16fe3573Def52bf1A6132D3d",
+      "private_key": "93efee3a96b07620f943fbf7413be3e2ed1030744391be051d237ad510e01020"
+    },
+    {
+      "address": "0xb45186bFaA28179Ea3987D365E26324297beA815",
+      "private_key": "9ed7706ce2b80d3354c045eb4a5e777f2ceba4e726cff10998a2ac8360c70b05"
+    },
+    {
+      "address": "0x93055922A1Ec2e39178062A48400Bd85a0a3DF47",
+      "private_key": "0x3731303345d5b11480bf68cb7c3c366faa7593b65f9a66dc4a29f91577007c44"
+    },
+    {
+      "address": "0x428143F9867a3D0206fB51709f53A332DeA77D4F",
+      "private_key": "0x34a906a305678750be0df86ae96c0063842f764beac8553741ec99306e8852e2"
+    },
+    {
+      "address": "0x51B3245B3Bc82772BC2Fa38318Ce4724C54D2e85",
+      "private_key": "0x903b95a1d9372cf282f345e021eae3bfb8815c40d2db900d79bd80f03d396fb9"
+    },
+    {
+      "address": "0x6d12ac7A0cCcB9deC218C832e7c6De4CCe8B9d3c",
+      "private_key": "0xe3e9654fb7834c1dd96a69ec94f407ac8bb34621d1b1fd8d21109053b62850f1"
+    },
+    {
+      "address": "0x45c3d263763555108FaF251F3e7ec00731751248",
+      "private_key": "0x59c24f26bc450e07b5be07ca4dcc5adc61dc6e6667ab0dec89cee97199422c28"
+    },
+    {
+      "address": "0x4e6274427C06986003E4835038189633FD018C43",
+      "private_key": "0x06d5ee710c32f80a3bba057c980d69939628aca3118c1e5a1bcb988347944224"
+    },
+    {
+      "address": "0x3cb258743f377D915c253A179063D8f79a80cB56",
+      "private_key": "0x0fd3492f6ee92a93a4066193f080c6d9fbcbce98509677123cecf143eb8f8fa2"
+    }
+    
+  ],
+  "tweets_db": "./scripts/filtered_tweets.txt"
+}

@@ -1,0 +1,40 @@
+type ChainSocial_CommentAdded {
+  id: ID!
+  commentId: BigInt!
+  postId: BigInt!
+  author: String!
+  content: String!
+}
+
+type ChainSocial_Followed {
+  id: ID!
+  follower: String!
+  followed: String!
+}
+
+type ChainSocial_PostCreated {
+  id: ID!
+  postId: BigInt!
+  author: String!
+  content: String!
+  blockHash: String!
+}
+
+type ChainSocial_PostLiked {
+  id: ID!
+  postId: BigInt!
+  liker: String!
+}
+
+type ChainSocial_Unfollowed {
+  id: ID!
+  follower: String!
+  followed: String!
+}
+
+type ChainSocial_UserCreated {
+  id: ID!
+  userAddress: String!
+  username: String!
+}
+
