@@ -5,6 +5,7 @@ import { blockchainRoutes } from './routes/blockchain';
 // Import the ChainSocial routes
 import { chainSocialRoutes } from './routes/chainSocial';
 import mongoose from 'mongoose';
+import { indexerReqsRoutes } from './routes/indexerReqs';
   
 try {
   mongoose.connect(process.env.MONGO_URI as string);
@@ -51,6 +52,7 @@ const app = new Elysia()
   })
   .use(blockchainRoutes)
   .use(chainSocialRoutes)
+  .use(indexerReqsRoutes)
   .listen(3000);
 
 console.log(`🦊 Elysia server is running at ${app.server?.hostname}:${app.server?.port}`);

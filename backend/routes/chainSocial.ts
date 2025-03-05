@@ -4,8 +4,8 @@ import * as chainSocialWriteFuncs from '../utils/chainSocialWriteFuncs';
 
 // Create ChainSocial-related routes
 export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
-  // Get user profile
-  .get('/user/:address', async ({ params }) => {
+
+.get('/user/:address', async ({ params }) => {
     try {
       const user = await chainSocialFuncs.getUser(params.address);
       return { user };
@@ -14,7 +14,7 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
     }
   })
   
-  // Simulate user creation without sending a transaction
+
   .post('/simulate/create-user', async ({ body }) => {
     try {
       // Extract parameters from request body

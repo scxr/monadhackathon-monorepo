@@ -2,10 +2,24 @@
 
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import styles from './Dashboard.module.css';
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, FormEvent, useRef, useCallback } from 'react';
 import { FaHome, FaSearch, FaBell, FaEnvelope, FaBookmark, FaList, FaUser, FaEllipsisH, FaImage, FaGift, FaPoll, FaSmile, FaCalendar, FaRetweet, FaHeart, FaShareSquare, FaComment } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+// Define the Post type
+interface Post {
+  id: number;
+  username: string;
+  handle: string;
+  avatar: string;
+  content: string;
+  time: string;
+  likes: number;
+  comments: number;
+  reposts: number;
+  postId: string | number;
+}
 
 export function Dashboard() {
   const { user, logout } = usePrivy();
@@ -13,66 +27,90 @@ export function Dashboard() {
   const [userData, setUserData] = useState<any>(null);
   const [postContent, setPostContent] = useState('');
   const [isPosting, setIsPosting] = useState(false);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [offset, setOffset] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [postIds, setPostIds] = useState<string[]>([]);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadingRef = useRef<HTMLDivElement>(null);
+  
+  const POSTS_PER_PAGE = 20;
   const activeWallet = wallets[0];
 
-  // Sample posts data
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      username: 'monad_dev',
-      handle: '@monad_official',
-      avatar: 'https://pbs.twimg.com/profile_images/1639076367933612032/X-4zopIR_400x400.jpg',
-      content: 'Excited to announce our latest protocol upgrade! Faster transactions and lower fees coming soon. #MonadBlockchain',
-      time: '2h',
-      likes: 245,
-      comments: 34,
-      reposts: 89
-    },
-    {
-      id: 2,
-      username: 'crypto_alice',
-      handle: '@alice_blockchain',
-      avatar: 'https://randomuser.me/api/portraits/women/42.jpg',
-      content: 'Just deployed my first smart contract on Monad! The developer experience is amazing. 10x faster than anything I\'ve used before.',
-      time: '5h',
-      likes: 123,
-      comments: 15,
-      reposts: 21
-    },
-    {
-      id: 3,
-      username: 'defi_whale',
-      handle: '@whale_watcher',
-      avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-      content: 'The TVL on Monad DeFi protocols has grown 300% this month alone. This is just the beginning! 📈 #DeFi #Monad',
-      time: '1d',
-      likes: 542,
-      comments: 87,
-      reposts: 156
-    },
-    {
-      id: 4,
-      username: 'defi_whale',
-      handle: '@whale_watcher',
-      avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-      content: 'The TVL on Monad DeFi protocols has grown 300% this month alone. This is just the beginning! 📈 #DeFi #Monad',
-      time: '1d',
-      likes: 542,
-      comments: 87,
-      reposts: 156
-    },
-    {
-      id: 5,
-      username: 'defi_whale',
-      handle: '@whale_watcher',
-      avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-      content: 'The TVL on Monad DeFi protocols has grown 300% this month alone. This is just the beginning! 📈 #DeFi #Monad',
-      time: '1d',
-      likes: 542,
-      comments: 87,
-      reposts: 156
+  const fetchPosts = async (currentOffset: number) => {
+    try {
+      setIsLoading(true);
+      console.log("Fetching posts", currentOffset);
+      const response = await fetch(`/api/get-posts?offset=${currentOffset}&limit=${POSTS_PER_PAGE}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch posts');
+      }
+
+      const data = await response.json();
+      
+      if (data.length < POSTS_PER_PAGE) {
+        console.log("No more posts", data.length);
+        setHasMore(false);
+      }
+      let validPosts = []
+      // const newPostIds = data.map((post: Post) => post.postId.toString());
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].postId) {
+          if (postIds.includes(data[i].postId.toString())) {
+            continue;
+          } else {
+            validPosts.push(data[i]);
+            postIds.push(data[i].postId.toString());
+          }
+        }
+      }
+      
+      setPosts(prevPosts => [...prevPosts, ...validPosts]);
+      setOffset(currentOffset + data.length);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      toast.error('Failed to load posts. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
-  ]);
+  };
+
+  // Initial posts fetch
+  useEffect(() => {
+    fetchPosts(0);
+  }, []);
+
+  // Intersection Observer setup
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+        console.log("Intersection:", first.intersectionRatio, hasMore, isLoading);
+        if (first.isIntersecting && hasMore && !isLoading) {
+          console.log("Triggering fetch with offset:", offset);
+          fetchPosts(offset);
+        }
+      },
+      { 
+        threshold: 0.1,
+        rootMargin: '100px'
+      }
+    );
+
+    if (loadingRef.current) {
+      observer.observe(loadingRef.current);
+    }
+
+    observerRef.current = observer;
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [offset, hasMore, isLoading]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -127,11 +165,10 @@ export function Dashboard() {
         }],
       });
       console.log("Transaction sent:", txHash);
-      // setPosts([newPost, ...posts]);
       setPostContent('');
       toast.success(
         <div>
-          Successfully created account! 
+          Successfully created post! 
           <a 
             href={`https://monad-testnet.socialscan.io/tx/${txHash}`} 
             target="_blank" 
@@ -151,6 +188,12 @@ export function Dashboard() {
         }
       );
       await fetch(`/api/create-post?txn=${txHash}`);
+      
+      // Refresh the posts after creating a new one
+      setPosts([]);
+      setOffset(0);
+      setHasMore(true);
+      fetchPosts(0);
     } catch (error) {
       console.error('Error creating post:', error);
       toast.error('Failed to create post. Please try again.');
@@ -211,7 +254,7 @@ export function Dashboard() {
           {/* Feed */}
           <div className={styles.feed}>
             {posts.map(post => (
-              <div key={post.id} className={styles.post}>
+              <div key={post.postId} className={styles.post}>
                 <div className={styles.postAvatar}>
                   <img src={post.avatar} alt={`${post.username}'s avatar`} />
                 </div>
@@ -233,6 +276,12 @@ export function Dashboard() {
                 </div>
               </div>
             ))}
+            
+            {/* Loading indicator */}
+            <div ref={loadingRef} className={styles.loadingIndicator}>
+              {isLoading && <div className={styles.spinner}>Loading...</div>}
+              {!hasMore && <div className={styles.noMorePosts}>No more posts</div>}
+            </div>
           </div>
         </div>
         

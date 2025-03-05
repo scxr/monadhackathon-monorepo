@@ -14,3 +14,5 @@ Content-Type: application/json
 {
   "transactionHash": "0x0ea1eedc6dab1320e523c15abc17613bb92d7ac04ce12eaa93b3ec6772268864"
 }
+###
+GET http://localhost:3000/data/posts-with-offset-and-limit/0/20
