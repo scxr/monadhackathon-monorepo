@@ -44,7 +44,214 @@ export async function getPostsByUser(userAddress: string) {
 }
 
 export async function getPostsWithOffsetAndLimit(offset: number, limit: number) {
-    let start = Date.now();
+    try {
+        let start = Date.now();
+        // Get posts
+        const postsResponse = await fetch(indexer_endpoint as string, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-hasura-admin-secret': 'testing'
+            },
+            body: JSON.stringify({ query: `{
+                ChainSocial_PostCreated(order_by: {postId: desc},offset: ${offset}, limit: ${limit}) {
+                    id
+                    content
+                    author
+                    postId
+                }
+            }` })
+        });
+
+        const postsData = await postsResponse.json();
+        if (!postsData.data?.ChainSocial_PostCreated) {
+            throw new Error('Failed to fetch posts');
+        }
+
+        const posts = postsData.data.ChainSocial_PostCreated;
+        const userAddresses = [...new Set(posts.map((post: any) => post.author))] as string[];
+        const postIds = posts.map((post: any) => post.postId);
+
+        // Batch fetch users and likes in parallel
+        const [users, likes, comments] = await Promise.all([
+            getUsers(userAddresses),
+            getPostLikes(postIds),
+            getPostComments(postIds)
+        ]);
+
+        // Map the data together
+        const postsWithUsers = posts.map((post: any) => ({
+            ...post,
+            user: users[post.author] || null,
+            likes: likes?.[post.postId] || {
+                likeCount: 0,
+                likers: []
+            },
+            comments: comments?.[post.postId] || {
+                commentCount: 0,
+                commenters: []
+            }
+        }));
+
+        console.log(`Time taken: ${Date.now() - start}ms`);
+        return postsWithUsers;
+    } catch (error) {
+        console.error('Error in getPostsWithOffsetAndLimit:', error);
+        throw error;
+    }
+}
+
+export async function getUsers(users: String[]) {
+    try {
+        let start = Date.now();
+        const response = await fetch(indexer_endpoint as string, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-hasura-admin-secret': 'testing'
+            },
+            body: JSON.stringify({ query: `{
+                ChainSocial_UserCreated(where: {userAddress: {_in: ${JSON.stringify(users)}}}) {
+                    id
+                    username
+                    userAddress
+                }
+            }` })
+        });
+
+        const data = await response.json();
+        if (!data.data?.ChainSocial_UserCreated) {
+            throw new Error('Failed to fetch users');
+        }
+
+        const userData: { [key: string]: any } = {};
+        data.data.ChainSocial_UserCreated.forEach((user: any) => {
+            userData[user.userAddress] = user;
+        });
+
+        console.log(`Time taken: ${Date.now() - start}ms`);
+        return userData;
+    } catch (error) {
+        console.error('Error in getUsers:', error);
+        throw error;
+    }
+}
+
+async function getPostLikes(postIds: number[]) {
+    try {
+        const response = await fetch(indexer_endpoint as string, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-hasura-admin-secret': 'testing'
+            },
+            body: JSON.stringify({ query: `{
+                ChainSocial_PostLiked(where: {postId: {_in: ${JSON.stringify(postIds)}}}) {
+                    postId
+                    liker
+                    id
+                }
+            }` })
+        });
+
+        
+        const data = await response.json();
+        if (!data.data?.ChainSocial_PostLiked) {
+            throw new Error('Failed to fetch likes');
+        }
+
+        const likes: { [key: number]: { likeCount: number, likers: string[] } } = {};
+        
+        // Initialize all postIds with empty likes
+        postIds.forEach(postId => {
+            likes[postId] = {
+                likeCount: 0,
+                likers: []
+            };
+        });
+
+        // Fill in the actual likes
+        data.data.ChainSocial_PostLiked.forEach((like: any) => {
+            if (!likes[like.postId]) {
+                likes[like.postId] = {
+                    likeCount: 0,
+                    likers: []
+                };
+            }
+            likes[like.postId].likers.push(like.liker);
+            likes[like.postId].likeCount++;
+        });
+
+        return likes;
+    } catch (error) {
+        console.error('Error in getPostLikes:', error);
+        throw error;
+    }
+}
+
+async function getPostComments(postIds: number[]) {
+    try {
+        const response = await fetch(indexer_endpoint as string, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-hasura-admin-secret': 'testing'
+            },
+            body: JSON.stringify({ query: `{
+                ChainSocial_CommentAdded(where: {postId: {_in: ${JSON.stringify(postIds)}}}) {
+                    commentId
+                    author
+                    content
+                    postId
+                    id
+                }
+            }` })
+        });
+
+        const data = await response.json();
+        if (!data.data?.ChainSocial_CommentAdded) {
+            throw new Error('Failed to fetch comments');
+        }
+
+        const comments: { [key: number]: { commentCount: number, commenters: string[], comments: string[] } } = {};
+
+        // Initialize all postIds with empty comments
+        postIds.forEach(postId => {
+            comments[postId] = {
+                commentCount: 0,
+                commenters: [],
+                comments: []
+            };
+        });
+
+        // Get all unique authors from comments
+        const uniqueAuthors = [...new Set(data.data.ChainSocial_CommentAdded.map((comment: any) => comment.author))] as string[];
+        
+        // Fetch all users in one batch
+        const users = await getUsers(uniqueAuthors);
+
+        // Process all comments
+        data.data.ChainSocial_CommentAdded.forEach((comment: any) => {
+            if (!comments[comment.postId]) {
+                comments[comment.postId] = {
+                    commentCount: 0,
+                    commenters: [],
+                    comments: []
+                };
+            }
+            comments[comment.postId].commenters.push(users[comment.author]?.username || comment.author);
+            comments[comment.postId].commentCount++;
+            comments[comment.postId].comments.push(comment.content);
+        });
+
+        return comments;
+    } catch (error) {
+        console.error('Error in getPostComments:', error);
+        throw error;
+    }
+}
+
+export async function getPostById(postId: number) {
     const response = await fetch(indexer_endpoint as string, {
         method: 'POST',
         headers: {
@@ -52,106 +259,38 @@ export async function getPostsWithOffsetAndLimit(offset: number, limit: number) 
             'x-hasura-admin-secret': 'testing'
         },
         body: JSON.stringify({ query: `{
-            ChainSocial_PostCreated(order_by: {postId: desc},offset: ${offset}, limit: ${limit}) {
+            ChainSocial_PostCreated(where: {postId: {_eq: ${postId}}}) {
                 id
                 content
                 author
-                postId
             }
         }` })
-    });
+    })
+
+
 
     const data = await response.json();
-    // console.log(JSON.stringify(data));
-    let posts = data.data.ChainSocial_PostCreated;
-    let useraddrs = posts.map((post: any) => post.author);
-    let postIds = posts.map((post: any) => post.postId);
-    let [users, likes] = await Promise.all([getUsers(useraddrs), getPostLikes(postIds)]);
-    let postsWithUsers = posts.map((post: any) => {
-        return {
-            ...post,
-            user: users[post.author],
-            likes: likes?.[post.postId] || {
-                likeCount: 0,
-                likers: []
-            }
-        }
-    });
-    return postsWithUsers;
-}
+    console.log(JSON.stringify(data));
+    if (!data.data?.ChainSocial_PostCreated) {
+        throw new Error('Failed to fetch post');
+    }
+    const post = data.data.ChainSocial_PostCreated[0];
+    const user = await getUsers([post.author]);
+    const likes = await getPostLikes([postId]);
+    const comments = await getPostComments([postId]);
 
-export async function getUsers(users: String[]) {
-    let start = Date.now();
-    let userData: { [key: string]: any } = {};
+    console.log("comments: ", comments[postId]);
 
-    for (let i = 0; i < users.length; i++) {
-        try {
-            const response = await fetch(indexer_endpoint as string, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-hasura-admin-secret': 'testing'
-                },
-                body: JSON.stringify({ query: `{
-                        ChainSocial_UserCreated(where: {userAddress: {_eq: "${users[i]}"}}) {
-                        id
-                        username
-                    }
-                }` })
-            });
+    const postWithUsers = {
+        ...post,
+        user: user[post.author],
+        likes: likes[postId],
+        comments: comments[postId]
+    }
     
-            const data = await response.json();
-            // userData.push(data);
-            if (data.data.ChainSocial_UserCreated.length > 0) {
-                userData[users[i].toString()] = data.data.ChainSocial_UserCreated[0];
-            }
-
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    // console.log(JSON.stringify(userData));
-    console.log(`Time taken: ${Date.now() - start}ms`);
-    return userData;
+    return postWithUsers;
 }
 
-async function getPostLikes(postIds: number[]) {
-    try {
-        let likes = {} as { [key: number]: { likeCount: number, likers: string[] } };
-        for (let i = 0; i < postIds.length; i++) {
-            const postId = postIds[i];
-            const response = await fetch(indexer_endpoint as string, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-hasura-admin-secret': 'testing'
-                },
-                body: JSON.stringify({ query: `{
-                    ChainSocial_PostLiked(where: {postId: {_eq: "${postId}"}}) {
-                        liker
-                        id
-                    }
-                }` })
-            })
-            const data = await response.json();
-            if (data.data.ChainSocial_PostLiked.length > 0) {
-                likes[postId] = {
-                    likeCount: data.data.ChainSocial_PostLiked.length,
-                    likers: data.data.ChainSocial_PostLiked.map((like: any) => like.liker)
-                }
-            } else {
-                likes[postId] = {
-                    likeCount: 0,
-                    likers: []
-                }
-            }
-        }
-        return likes;
-    } catch (error) {
-        console.error(error);
-    }
-}
 // getAllPosts();
 // getPostsByUser("0xC7A0c405DF55943E37d76B1E3c67FdD6518b26f3");
 // getPostsWithOffsetAndLimit(10, 16);

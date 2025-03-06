@@ -1,0 +1,246 @@
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #000;
+  min-height: 100vh;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  margin-bottom: 20px;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: background-color 0.2s;
+  border-radius: 9999px;
+}
+
+.backButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.backButton svg {
+  font-size: 1.2rem;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: #fff;
+  font-size: 1.2rem;
+}
+
+.post {
+  display: flex;
+  padding: 20px;
+  border-bottom: 1px solid #2f3336;
+  margin-bottom: 20px;
+}
+
+.postAvatar {
+  margin-right: 15px;
+}
+
+.postAvatar img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.postContent {
+  flex: 1;
+}
+
+.postHeader {
+  margin-bottom: 10px;
+}
+
+.postUsername {
+  font-weight: bold;
+  color: #fff;
+  margin-right: 5px;
+}
+
+.postHandle {
+  color: #71767b;
+  margin-right: 5px;
+}
+
+.postTime {
+  color: #71767b;
+}
+
+.postText {
+  color: #fff;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.postActions {
+  display: flex;
+  gap: 20px;
+}
+
+.postActions button {
+  background: none;
+  border: none;
+  color: #71767b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px;
+  transition: color 0.2s;
+}
+
+.postActions button:hover {
+  color: #1d9bf0;
+}
+
+.commentInput {
+  display: flex;
+  padding: 20px;
+  border-bottom: 1px solid #2f3336;
+  margin-bottom: 20px;
+}
+
+.userAvatar {
+  margin-right: 15px;
+}
+
+.userAvatar img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.inputWrapper {
+  flex: 1;
+}
+
+.inputWrapper textarea {
+  width: 100%;
+  min-height: 100px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  resize: none;
+  margin-bottom: 10px;
+}
+
+.inputWrapper textarea:focus {
+  outline: none;
+}
+
+.inputActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mediaButtons {
+  display: flex;
+  gap: 15px;
+}
+
+.mediaButtons button {
+  background: none;
+  border: none;
+  color: #1d9bf0;
+  cursor: pointer;
+  padding: 5px;
+  transition: color 0.2s;
+}
+
+.mediaButtons button:hover {
+  color: #1a8cd8;
+}
+
+.commentButton {
+  background-color: #1d9bf0;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.commentButton:hover {
+  background-color: #1a8cd8;
+}
+
+.commentButton:disabled {
+  background-color: #1d9bf0;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.commentsSection {
+  padding: 20px;
+}
+
+.commentsSection h2 {
+  color: #fff;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.noComments {
+  color: #71767b;
+  text-align: center;
+  padding: 20px;
+  font-size: 1.1rem;
+}
+
+.comment {
+  display: flex;
+  padding: 15px 0;
+  border-bottom: 1px solid #2f3336;
+}
+
+.commentAvatar {
+  margin-right: 15px;
+}
+
+.commentAvatar img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.commentContent {
+  flex: 1;
+}
+
+.commentHeader {
+  margin-bottom: 5px;
+}
+
+.commentUsername {
+  font-weight: bold;
+  color: #fff;
+  margin-right: 5px;
+}
+
+.commentTime {
+  color: #71767b;
+}
+
+.commentText {
+  color: #fff;
+  line-height: 1.5;
+} 

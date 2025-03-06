@@ -150,6 +150,25 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
       return { error: 'Failed to simulate like post', message: (error as Error).message };
     }
   })
+
+  .post('/simulate/add-comment', async ({ body }) => {
+    try {
+      const { postId, content } = body as { postId: number; content: string };
+      if (!postId || !content) {
+        return { 
+          error: 'Missing required parameters', 
+          message: 'postId and content are required' 
+        };
+      }
+      
+      const result = await chainSocialWriteFuncs.addComment(postId, content);
+      return result;
+    } catch (error) {
+      console.error(error);
+      return { error: 'Failed to simulate add comment', message: (error as Error).message };
+    }
+  })
+  
   
 
   // Confirm post creation and decode events

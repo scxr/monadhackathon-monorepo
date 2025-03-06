@@ -17,5 +17,8 @@ export const indexerReqsRoutes = new Elysia({ prefix: '/data' })
     })
     .get('/posts-with-offset-and-limit/:offset/:limit', async ({ params }) => {
         return await indexerReqs.getPostsWithOffsetAndLimit(Number(params.offset), Number(params.limit));
+    })
+    .get('/post/:id', async ({ params }) => {
+        return await indexerReqs.getPostById(Number(params.id));
     });
 

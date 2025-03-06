@@ -6,6 +6,7 @@ import { useState, useEffect, FormEvent, useRef, useCallback } from 'react';
 import { FaHome, FaSearch, FaBell, FaEnvelope, FaBookmark, FaList, FaUser, FaEllipsisH, FaImage, FaGift, FaPoll, FaSmile, FaCalendar, FaRetweet, FaHeart, FaShareSquare, FaComment } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Link from 'next/link';
 
 // Define the Post type
 interface Post {
@@ -16,7 +17,10 @@ interface Post {
   content: string;
   time: string;
 
-  comments: number;
+  comments: {
+    commentCount: number;
+    comments: string[];
+  }
   reposts: number;
   postId: string | number;
   user: {
@@ -324,32 +328,47 @@ export function Dashboard() {
           {/* Feed */}
           <div className={styles.feed}>
             {posts.map(post => (
-              <div key={post.postId} className={styles.post}>
-                <div className={styles.postAvatar}>
-                  <img src={post.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'} alt={`${post.user.username}'s avatar`} />
+              <Link href={`/post/${post.postId}`} key={post.postId} className={styles.postLink}>
+                <div className={styles.post}>
+                  <div className={styles.postAvatar}>
+                    <img src={post.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'} alt={`${post.user.username}'s avatar`} />
+                  </div>
+                  <div className={styles.postContent}>
+                    <div className={styles.postHeader}>
+                      <span className={styles.postUsername}>{post.user.username}</span>
+                      <span className={styles.postHandle}>{post.handle}</span>
+                      <span className={styles.postTime}>· {post.time}</span>
+                    </div>
+                    <div className={styles.postText}>
+                      {post.content}
+                    </div>
+                    <div className={styles.postActions}>
+                      <button onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}><FaComment /> <span>{post.comments.commentCount}</span></button>
+                      <button onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}><FaRetweet /> <span>{post.reposts}</span></button>
+                      <button 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleLikePost(post.postId.toString());
+                        }}
+                        className={post.likes.likers.includes(activeWallet.address) ? styles.likedButton : ''}
+                      >
+                        <FaHeart /> <span>{post.likes.likeCount}</span>
+                      </button>
+                      <button onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}><FaShareSquare /></button>
+                    </div>
+                  </div>
                 </div>
-                <div className={styles.postContent}>
-                  <div className={styles.postHeader}>
-                    <span className={styles.postUsername}>{post.user.username}</span>
-                    <span className={styles.postHandle}>{post.handle}</span>
-                    <span className={styles.postTime}>· {post.time}</span>
-                  </div>
-                  <div className={styles.postText}>
-                    {post.content}
-                  </div>
-                  <div className={styles.postActions}>
-                    <button><FaComment /> <span>{post.comments}</span></button>
-                    <button><FaRetweet /> <span>{post.reposts}</span></button>
-                    <button 
-                      onClick={() => handleLikePost(post.postId.toString())}
-                      className={post.likes.likers.includes(activeWallet.address) ? styles.likedButton : ''}
-                    >
-                      <FaHeart /> <span>{post.likes.likeCount}</span>
-                    </button>
-                    <button><FaShareSquare /></button>
-                  </div>
-                </div>
-              </div>
+              </Link>
             ))}
             
             {/* Loading indicator */}

@@ -23,3 +23,5 @@ Content-Type: application/json
 {
   "postId": 1
 }
+###
+GET http://localhost:3000/data/post/422

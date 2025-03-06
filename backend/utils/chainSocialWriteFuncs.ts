@@ -188,3 +188,29 @@ export async function confirmCreatePost(transactionHash: string) {
     };
   }
 }
+
+export async function addComment(postId: number, content: string) {
+  try {
+    // const chainSocialContract = getChainSocialContract();
+
+    // Get the current timestamp (in seconds)
+
+    const txData = encodeFunctionData({
+      abi: ChainSocialABI,
+      functionName: 'commentOnPost',
+      args: [postId, content]
+    }); 
+
+    return {
+      transactionData: txData,
+      estimatedGas: '0',
+      contractAddress: CHAIN_SOCIAL_ADDRESS,
+    };
+  } catch (error) { 
+    console.error('Error adding comment:', error);
+    return {
+      success: false,
+      error: (error as Error).message
+    };
+  }
+}

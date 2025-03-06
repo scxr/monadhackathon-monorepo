@@ -6,12 +6,13 @@ export async function GET(
   context: { params: { id: string } }
 ) {
   try {
-    const { id } = context.params;
+    const { id } = await context.params;
     
     // Get post data
-    const post = await kv.hgetall(`post:${id}`);
-    
-    if (!post) {
+    const post = await fetch(`http://localhost:3000/data/post/${id}`);
+    const postData = await post.json();
+
+    if (!postData) {
       return NextResponse.json(
         { error: 'Post not found' },
         { status: 404 }
@@ -19,13 +20,13 @@ export async function GET(
     }
     
     // Get like count
-    const likeCount = await kv.scard(`post:${id}:likes`);
+    const likeCount = postData.likes.likeCount;
     
     // Get comments (if implemented)
     // const comments = await kv.lrange(`post:${id}:comments`, 0, -1);
     
     return NextResponse.json({
-      ...post,
+      ...postData,
       likes: likeCount || 0,
       // comments: comments || []
     });

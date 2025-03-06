@@ -804,4 +804,15 @@
   text-align: center;
   color: #71767b;
   font-size: 0.9rem;
+}
+
+.postLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.2s;
+}
+
+.postLink:hover {
+  background-color: rgba(255, 255, 255, 0.03);
 } 
