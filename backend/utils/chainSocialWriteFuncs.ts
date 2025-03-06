@@ -4,7 +4,7 @@ import ChainSocialABI from '../abis/ChainSocial.json';
 import { decodeChainSocialEvents } from './chainSocialViewFuncs';
 import type { Post } from '../models/types';
 import { createPostInDb } from '../models/Posts';
-const CHAIN_SOCIAL_ADDRESS = '0xcCB869B793B231dB5a2aA7c1bbCB5297DC3F6288' as `0x${string}`;
+const CHAIN_SOCIAL_ADDRESS = '0xB42497ACe9f353DADD5A8EF2f2Cb58176C465A95' as `0x${string}`;
 
 const getChainSocialContract = () => {
   return getContract({
@@ -54,6 +54,31 @@ export async function simulateCreateUser(userAddress: string, username: string, 
     };
   } catch (error) {
     console.error('Error simulating user creation:', error);
+    throw error;
+  }
+}
+
+export async function likePost(postId: number) {
+  try {
+    const chainSocialContract = getChainSocialContract();
+
+    // Get the current timestamp (in seconds)
+    const timestamp = BigInt(Math.floor(Date.now() / 1000));
+
+    const txData = encodeFunctionData({
+      abi: ChainSocialABI,
+      functionName: 'likePost',
+      args: [postId]
+    }); 
+
+    return {
+      transactionData: txData,
+      estimatedGas: '0', 
+      contractAddress: CHAIN_SOCIAL_ADDRESS,
+    };
+
+  } catch (error) {
+    console.error('Error simulating post creation:', error);
     throw error;
   }
 }

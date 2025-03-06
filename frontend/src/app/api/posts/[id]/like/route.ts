@@ -7,33 +7,18 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { userAddress } = await req.json();
-    const postId = params.id;
-
-    if (!userAddress) {
-      return NextResponse.json(
-        { error: 'User address is required' },
-        { status: 400 }
-      );
-    }
-
-    // Check if user has already liked the post
-    const hasLiked = await kv.sismember(`post:${postId}:likes`, userAddress);
-    if (hasLiked) {
-      return NextResponse.json(
-        { error: 'User has already liked this post' },
-        { status: 400 }
-      );
-    }
-
-    // Add user to post's likes set
-    await kv.sadd(`post:${postId}:likes`, userAddress);
-    
-    // Increment post's like count
-    await kv.hincrby(`post:${postId}`, 'likes', 1);
-
-    revalidatePath('/api/posts');
-    return NextResponse.json({ success: true });
+    const { postId } = await req.json();
+    let response = await fetch(`http://localhost:3000/chain-social/simulate/like-post`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        postId: postId
+      })
+    })
+    const data = await response.json();
+    return NextResponse.json(data);
   } catch (error) {
     console.error('Error liking post:', error);
     return NextResponse.json(

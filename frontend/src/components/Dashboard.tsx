@@ -15,10 +15,18 @@ interface Post {
   avatar: string;
   content: string;
   time: string;
-  likes: number;
+
   comments: number;
   reposts: number;
   postId: string | number;
+  user: {
+    username: string;
+    id: string;
+  }
+  likes: {
+    likeCount: number;
+    likers: string[];
+  }
 }
 
 export function Dashboard() {
@@ -32,8 +40,10 @@ export function Dashboard() {
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [postIds, setPostIds] = useState<string[]>([]);
+  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
+  
   
   const POSTS_PER_PAGE = 20;
   const activeWallet = wallets[0];
@@ -55,13 +65,20 @@ export function Dashboard() {
         setHasMore(false);
       }
       let validPosts = []
-      // const newPostIds = data.map((post: Post) => post.postId.toString());
       for (let i = 0; i < data.length; i++) {
         if (data[i].postId) {
           if (postIds.includes(data[i].postId.toString())) {
             continue;
           } else {
-            validPosts.push(data[i]);
+            // Ensure likes object is properly structured
+            const post = {
+              ...data[i],
+              likes: {
+                likeCount: Number(data[i].likes?.likeCount) || 0,
+                likers: data[i].likes?.likers || []
+              }
+            };
+            validPosts.push(post);
             postIds.push(data[i].postId.toString());
           }
         }
@@ -157,7 +174,7 @@ export function Dashboard() {
       const txHash = await provider.request({
         method: 'eth_sendTransaction',
         params: [{
-          to: "0xccb869b793b231db5a2aa7c1bbcb5297dc3f6288",
+          to: "0xB42497ACe9f353DADD5A8EF2f2Cb58176C465A95",
           value: "0x0",
           data: data.data,
           from: activeWallet.address,
@@ -199,6 +216,59 @@ export function Dashboard() {
       toast.error('Failed to create post. Please try again.');
     } finally {
       setIsPosting(false);
+    }
+  };
+
+  const handleLikePost = async (postId: string) => {
+    try {
+      let post = posts.find(post => post.postId.toString() === postId);
+      if (!post) {
+        toast.error('Post not found');
+        return;
+      }
+      if (post.likes.likers.includes(activeWallet.address)) {
+        toast.error('You already liked this post');
+        return;
+      }
+      const response = await fetch(`/api/posts/${postId}/like`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ postId }),
+      });
+      const data = await response.json();
+      const provider = await activeWallet.getEthereumProvider();
+      const txHash = await provider.request({
+        method: 'eth_sendTransaction',
+        params: [{
+          to: "0xB42497ACe9f353DADD5A8EF2f2Cb58176C465A95",
+          value: "0x0",
+          data: data.transactionData,
+          from: activeWallet.address,
+          gasLimit: 175000
+        }],
+      });
+      
+      // Update the UI optimistically
+      setPosts(prevPosts => 
+        prevPosts.map(post => 
+          post.postId.toString() === postId
+            ? {
+                ...post,
+                likes: {
+                  likeCount: post.likes.likeCount + 1,
+                  likers: [...post.likes.likers, activeWallet.address]
+                }
+              }
+            : post
+        )
+      );
+
+      console.log("Post liked:", data);
+    } catch (error) {
+      console.error('Error liking post:', error);
+      toast.error('Failed to like post. Please try again.');
     }
   };
 
@@ -256,11 +326,11 @@ export function Dashboard() {
             {posts.map(post => (
               <div key={post.postId} className={styles.post}>
                 <div className={styles.postAvatar}>
-                  <img src={post.avatar} alt={`${post.username}'s avatar`} />
+                  <img src={post.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'} alt={`${post.user.username}'s avatar`} />
                 </div>
                 <div className={styles.postContent}>
                   <div className={styles.postHeader}>
-                    <span className={styles.postUsername}>{post.username}</span>
+                    <span className={styles.postUsername}>{post.user.username}</span>
                     <span className={styles.postHandle}>{post.handle}</span>
                     <span className={styles.postTime}>· {post.time}</span>
                   </div>
@@ -270,7 +340,12 @@ export function Dashboard() {
                   <div className={styles.postActions}>
                     <button><FaComment /> <span>{post.comments}</span></button>
                     <button><FaRetweet /> <span>{post.reposts}</span></button>
-                    <button><FaHeart /> <span>{post.likes}</span></button>
+                    <button 
+                      onClick={() => handleLikePost(post.postId.toString())}
+                      className={post.likes.likers.includes(activeWallet.address) ? styles.likedButton : ''}
+                    >
+                      <FaHeart /> <span>{post.likes.likeCount}</span>
+                    </button>
                     <button><FaShareSquare /></button>
                   </div>
                 </div>

@@ -3,7 +3,7 @@ import { getContract, encodeFunctionData, decodeEventLog, type Log } from 'viem'
 import ChainSocialABI from '../abis/ChainSocial.json';
 
 // Contract address for the ChainSocial contract
-const CHAIN_SOCIAL_ADDRESS = '0xcCB869B793B231dB5a2aA7c1bbCB5297DC3F6288' as `0x${string}`;
+const CHAIN_SOCIAL_ADDRESS = '0xB42497ACe9f353DADD5A8EF2f2Cb58176C465A95' as `0x${string}`;
 
 // Function to decode events from transaction logs
 export async function decodeChainSocialEvents(txHash: string) {

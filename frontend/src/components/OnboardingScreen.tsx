@@ -171,7 +171,7 @@ export function OnboardingScreen() {
         const txHash = await provider.request({
           method: 'eth_sendTransaction',
           params: [{
-            to: "0xccb869b793b231db5a2aa7c1bbcb5297dc3f6288",
+            to: "0xB42497ACe9f353DADD5A8EF2f2Cb58176C465A95",
             value: "0x0",
             data: data.transactionData,
             from: activeWallet.address,

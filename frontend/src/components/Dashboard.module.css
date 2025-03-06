@@ -220,6 +220,14 @@
   color: #1DA1F2;
 }
 
+.likedButton {
+  color: #F91880 !important;
+}
+
+.likedButton svg {
+  fill: #F91880;
+}
+
 /* User Info Box */
 .userInfoBox {
   margin-top: 20px;

@@ -129,6 +129,29 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
     }
   })
 
+  .post('/simulate/like-post', async ({ body }) => {
+    console.log("hi")
+    console.log("body: ", body)
+    try {
+      console.log("hi")
+      const { postId } = body as { postId: number };
+      console.log("Post id: ", postId);
+      if (!postId) {
+        return { 
+          error: 'Missing required parameters', 
+          message: 'postId is required' 
+        };
+      }
+      
+      const result = await chainSocialWriteFuncs.likePost(postId);
+      return result;
+    } catch (error) {
+      console.error(error);
+      return { error: 'Failed to simulate like post', message: (error as Error).message };
+    }
+  })
+  
+
   // Confirm post creation and decode events
   .post("/confirm/create-post", async ({ body }) => {
     try {

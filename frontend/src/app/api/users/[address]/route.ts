@@ -4,13 +4,17 @@ import { revalidatePath } from 'next/cache';
 
 export async function GET(
   request: Request,
-  context: { params: { address: string } }
+  { params }: { params: { address: string } }
 ) {
   try {
-    const { address } = await context.params;
+    // await params
+    const {address} = await params;
+    console.log(`http://localhost:3000/chain-social/user/${address}`);
     const response = await fetch(`http://localhost:3000/chain-social/user/${address}`);
     
-    if (!response.ok) {
+    console.log(response);
+    if (response.status !== 200) {
+      console.log("User not found", response.status);
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
@@ -18,6 +22,7 @@ export async function GET(
     }
     
     const userData = await response.json();
+    console.log(userData);
     if (userData.user.exists === false) {
       return NextResponse.json(
         { error: 'User not found' },

@@ -16,3 +16,10 @@ Content-Type: application/json
 }
 ###
 GET http://localhost:3000/data/posts-with-offset-and-limit/0/20
+###
+POST http://localhost:3000/chain-social/simulate/like-post
+Content-Type: application/json
+
+{
+  "postId": 1
+}
