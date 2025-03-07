@@ -101,6 +101,49 @@ export async function getPostsWithOffsetAndLimit(offset: number, limit: number) 
     }
 }
 
+export async function getUserPosts(userAddress: string) {
+    const response = await fetch(indexer_endpoint as string, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-hasura-admin-secret': 'testing'
+        },
+        body: JSON.stringify({ query: `{
+            ChainSocial_PostCreated(where: {author: {_eq: "${userAddress}"}}) {
+                id
+                content
+                postId
+            }
+        }` })
+    })
+
+    const data = await response.json();
+
+    console.log(data);
+
+    const posts = data.data.ChainSocial_PostCreated;
+    const postIds = posts.map((post: any) => post.postId);
+
+    const [likes, comments] = await Promise.all([
+        getPostLikes(postIds),
+        getPostComments(postIds)
+    ]);
+
+    console.log(likes);
+    console.log(comments);
+    
+
+    const postsWithLikesAndComments = posts.map((post: any) => ({
+        ...post,
+        likes: likes[post.postId],
+        comments: comments[post.postId]
+    }));
+
+    let postsReversed = postsWithLikesAndComments.reverse();
+
+    return postsReversed;
+}
+
 export async function getUsers(users: String[]) {
     try {
         let start = Date.now();
@@ -126,7 +169,7 @@ export async function getUsers(users: String[]) {
 
         const userData: { [key: string]: any } = {};
         data.data.ChainSocial_UserCreated.forEach((user: any) => {
-            userData[user.userAddress] = user;
+            userData[user.userAddress] = user;  
         });
 
         console.log(`Time taken: ${Date.now() - start}ms`);

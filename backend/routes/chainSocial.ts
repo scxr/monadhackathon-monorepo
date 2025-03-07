@@ -1,11 +1,18 @@
 import { Elysia } from 'elysia';
 import * as chainSocialFuncs from '../utils/chainSocialViewFuncs';
 import * as chainSocialWriteFuncs from '../utils/chainSocialWriteFuncs';
+import { uploadBase64ToIPFS } from '../utils/ipfs';
+import { cors } from '@elysiajs/cors';
 
 // Create ChainSocial-related routes
 export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
-
-.get('/user/:address', async ({ params }) => {
+  .use(cors({
+    origin: '*', // Be more restrictive in production
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  }))
+  .get('/user/:address', async ({ params }) => {
     try {
       const user = await chainSocialFuncs.getUser(params.address);
       return { user };
@@ -13,7 +20,37 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
       return { error: 'Failed to get user', message: (error as Error).message };
     }
   })
-  
+
+  .put('/user/:address', async ({ params, body }) => {
+    try {
+      const { bio, pfpImage } = body as { bio: string; pfpImage?: string };
+      console.log("bio: ", bio)
+      console.log("pfpImage: ", pfpImage)
+      // Check if we have a base64 image
+      let pfpLink = '';
+      if (pfpImage && pfpImage.includes('base64')) {
+        // Generate a unique filename
+        const fileName = `profile_${params.address}_${Date.now()}.jpg`;
+        
+        // Upload the image to IPFS
+        const ipfsHash = await uploadBase64ToIPFS(pfpImage, fileName);
+        
+        // Create the IPFS link
+        pfpLink = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
+        console.log(`Image uploaded to IPFS: ${pfpLink}`);
+      } else if (body && (body as any).pfpLink) {
+        // If pfpLink is directly provided, use it
+        pfpLink = (body as any).pfpLink;
+      }
+      
+      // Update the user with the new bio and pfpLink
+      const result = await chainSocialWriteFuncs.updateUser(bio, pfpLink);
+      return { ...result, pfpLink };
+    } catch (error) {
+      console.error('Error updating user:', error);
+      return { error: 'Failed to update user', message: (error as Error).message };
+    }
+  })
 
   .post('/simulate/create-user', async ({ body }) => {
     try {

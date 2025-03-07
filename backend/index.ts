@@ -6,7 +6,7 @@ import { blockchainRoutes } from './routes/blockchain';
 import { chainSocialRoutes } from './routes/chainSocial';
 import mongoose from 'mongoose';
 import { indexerReqsRoutes } from './routes/indexerReqs';
-  
+import {swagger} from "@elysiajs/swagger"
 try {
   mongoose.connect(process.env.MONGO_URI as string);
 } catch (error) {
@@ -45,6 +45,7 @@ export const publicClient = createPublicClient({
 
 // Create an Elysia app
 const app = new Elysia()
+  .use(swagger())
   .get('/', () => 'Hello from Elysia with Viem!')
   .get('/block-number', async () => {
     const blockNumber = await publicClient.getBlockNumber();

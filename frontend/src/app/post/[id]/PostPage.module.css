@@ -2,8 +2,67 @@
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
+  padding-top: 80px; /* Add space for fixed header */
   background-color: #000;
   min-height: 100vh;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid #2f3336;
+}
+
+.headerContent {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+}
+
+.headerExpanded {
+  height: 60px;
+}
+
+.headerCollapsed {
+  height: 50px;
+}
+
+.nav {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.navItem {
+  color: #71767b;
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  font-size: 1rem;
+}
+
+.navItem:hover {
+  color: #fff;
+}
+
+.navItem.active {
+  color: #fff;
+  font-weight: bold;
 }
 
 .backButton {
@@ -17,12 +76,11 @@
   color: #fff;
   cursor: pointer;
   font-size: 1.1rem;
-  transition: background-color 0.2s;
-  border-radius: 9999px;
+  transition: color 0.2s;
 }
 
 .backButton:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  color: #1d9bf0;
 }
 
 .backButton svg {
@@ -47,6 +105,12 @@
 
 .postAvatar {
   margin-right: 15px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.postAvatar:hover {
+  opacity: 0.8;
 }
 
 .postAvatar img {
@@ -68,6 +132,13 @@
   font-weight: bold;
   color: #fff;
   margin-right: 5px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.postUsername:hover {
+  color: #1d9bf0;
+  text-decoration: underline;
 }
 
 .postHandle {

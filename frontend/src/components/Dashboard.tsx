@@ -3,10 +3,11 @@
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import styles from './Dashboard.module.css';
 import { useState, useEffect, FormEvent, useRef, useCallback } from 'react';
-import { FaHome, FaSearch, FaBell, FaEnvelope, FaBookmark, FaList, FaUser, FaEllipsisH, FaImage, FaGift, FaPoll, FaSmile, FaCalendar, FaRetweet, FaHeart, FaShareSquare, FaComment } from 'react-icons/fa';
+import { FaHome, FaSearch, FaBell, FaEnvelope, FaBookmark, FaList, FaUser, FaEllipsisH, FaImage, FaGift, FaPoll, FaSmile, FaCalendar, FaRetweet, FaHeart, FaShareSquare, FaComment, FaEdit, FaSignOutAlt } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 // Define the Post type
 interface Post {
@@ -16,6 +17,7 @@ interface Post {
   avatar: string;
   content: string;
   time: string;
+  author: string;
 
   comments: {
     commentCount: number;
@@ -26,6 +28,7 @@ interface Post {
   user: {
     username: string;
     id: string;
+    address: string;
   }
   likes: {
     likeCount: number;
@@ -36,45 +39,59 @@ interface Post {
 export function Dashboard() {
   const { user, logout } = usePrivy();
   const { wallets } = useWallets();
-  const [userData, setUserData] = useState<any>(null);
   const [postContent, setPostContent] = useState('');
-  const [isPosting, setIsPosting] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
   const [offset, setOffset] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [postIds, setPostIds] = useState<string[]>([]);
-  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
-  const observerRef = useRef<IntersectionObserver | null>(null);
+  const [userData, setUserData] = useState<any>(null);
+  const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
+  const [isPosting, setIsPosting] = useState(false);
+  const postIdsRef = useRef<Set<string>>(new Set());
   const loadingRef = useRef<HTMLDivElement>(null);
-  
-  
-  const POSTS_PER_PAGE = 20;
+  const observerRef = useRef<IntersectionObserver | null>(null);
   const activeWallet = wallets[0];
+  const router = useRouter();
+
+  // Add scroll event listener
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsHeaderCollapsed(window.scrollY > 60);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const POSTS_PER_PAGE = 20;
 
   const fetchPosts = async (currentOffset: number) => {
+    if (isLoading) return;
+    
+    setIsLoading(true);
+    
     try {
-      setIsLoading(true);
-      console.log("Fetching posts", currentOffset);
       const response = await fetch(`/api/get-posts?offset=${currentOffset}&limit=${POSTS_PER_PAGE}`);
-      
       if (!response.ok) {
         throw new Error('Failed to fetch posts');
       }
-
+      
       const data = await response.json();
       
-      if (data.length < POSTS_PER_PAGE) {
-        console.log("No more posts", data.length);
+      if (data.length === 0) {
         setHasMore(false);
+        return;
       }
-      let validPosts = []
+      
+      const validPosts: Post[] = [];
+      
       for (let i = 0; i < data.length; i++) {
+        console.log(data[i]);
         if (data[i].postId) {
-          if (postIds.includes(data[i].postId.toString())) {
-            continue;
-          } else {
-            // Ensure likes object is properly structured
+          const postIdStr = data[i].postId.toString();
+          // Check if this post ID is already in our tracked IDs
+          if (!postIdsRef.current.has(postIdStr)) {
+            // Create a properly structured post object
             const post = {
               ...data[i],
               likes: {
@@ -83,13 +100,15 @@ export function Dashboard() {
               }
             };
             validPosts.push(post);
-            postIds.push(data[i].postId.toString());
+            // Add to our Set of tracked IDs
+            postIdsRef.current.add(postIdStr);
           }
         }
       }
       
+      // Only add posts that aren't duplicates
       setPosts(prevPosts => [...prevPosts, ...validPosts]);
-      setOffset(currentOffset + data.length);
+      setOffset(currentOffset + POSTS_PER_PAGE);
     } catch (error) {
       console.error('Error fetching posts:', error);
       toast.error('Failed to load posts. Please try again.');
@@ -98,40 +117,15 @@ export function Dashboard() {
     }
   };
 
-  // Initial posts fetch
+  // Reset posts when component mounts
   useEffect(() => {
+    // Clear existing posts and IDs when component mounts
+    setPosts([]);
+    postIdsRef.current = new Set();
+    setOffset(0);
+    setHasMore(true);
     fetchPosts(0);
   }, []);
-
-  // Intersection Observer setup
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const first = entries[0];
-        console.log("Intersection:", first.intersectionRatio, hasMore, isLoading);
-        if (first.isIntersecting && hasMore && !isLoading) {
-          console.log("Triggering fetch with offset:", offset);
-          fetchPosts(offset);
-        }
-      },
-      { 
-        threshold: 0.1,
-        rootMargin: '100px'
-      }
-    );
-
-    if (loadingRef.current) {
-      observer.observe(loadingRef.current);
-    }
-
-    observerRef.current = observer;
-
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-    };
-  }, [offset, hasMore, isLoading]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -157,9 +151,36 @@ export function Dashboard() {
     fetchUserData();
   }, [activeWallet]);
 
+  // Intersection Observer setup
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+        if (first.isIntersecting && hasMore && !isLoading) {
+          fetchPosts(offset);
+        }
+      },
+      { 
+        threshold: 0.1,
+        rootMargin: '100px'
+      }
+    );
+
+    if (loadingRef.current) {
+      observer.observe(loadingRef.current);
+    }
+
+    observerRef.current = observer;
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [offset, hasMore, isLoading]);
+
   const handlePostSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    
     if (!postContent.trim()) return;
     
     setIsPosting(true);
@@ -277,144 +298,156 @@ export function Dashboard() {
   };
 
   return (
-    <div className={styles.twitterLayout}>
-      <ToastContainer theme="dark" />
-      
-      {/* Header */}
-      <div className={styles.header}>
-        <h1 className={styles.logo}>MonadSocial</h1>
-      </div>
-      
-      <div className={styles.mainContainer}>
-        {/* Left Column - Home label */}
-        <div className={styles.leftColumn}>
-          <div className={styles.homeLabel}>Home</div>
-          
-          {/* User Input Area */}
-          <div className={styles.userInputArea}>
-            <div className={styles.userAvatar}>
-              <img 
-                src={userData?.user?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'} 
-                alt="Your avatar" 
-              />
+    <>
+      {/* Fixed Header */}
+      <header className={`${styles.header} ${isHeaderCollapsed ? styles.headerCollapsed : styles.headerExpanded}`}>
+        <div className={styles.headerContent}>
+          <nav className={styles.nav}>
+            <Link href="/" className={`${styles.navItem} ${styles.active}`}>
+              <FaHome /> {!isHeaderCollapsed && "Home"}
+            </Link>
+            <Link href="/create" className={styles.navItem}>
+              <FaEdit /> {!isHeaderCollapsed && "Post"}
+            </Link>
+            <Link href="/profile" className={styles.navItem}>
+              <FaUser /> {!isHeaderCollapsed && "Profile"}
+            </Link>
+            <button onClick={logout} className={styles.navItem}>
+              <FaSignOutAlt /> {!isHeaderCollapsed && "Logout"}
+            </button>
+          </nav>
+        </div>
+      </header>
+
+      <div className={styles.twitterLayout}>
+        <ToastContainer theme="dark" />
+        
+        <div className={styles.mainContainer}>
+          {/* Left Column - Home label */}
+          <div className={styles.leftColumn}>
+            <div className={styles.homeLabel}>
+              <h2>Home</h2>
             </div>
-            <div className={styles.inputWrapper}>
-              <textarea 
-                placeholder="What's happening?"
-                value={postContent}
-                onChange={(e) => setPostContent(e.target.value)}
-                maxLength={280}
-              />
-              
-              <div className={styles.inputActions}>
-                <div className={styles.mediaButtons}>
-                  <button type="button"><FaImage /></button>
-                  <button type="button"><FaGift /></button>
-                  <button type="button"><FaPoll /></button>
-                  <button type="button"><FaSmile /></button>
-                  <button type="button"><FaCalendar /></button>
+
+            {/* Post Input */}
+            <div className={styles.userInputArea}>
+              <div className={styles.userAvatar}>
+                <img 
+                  src={userData?.user?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'} 
+                  alt="Your avatar" 
+                />
+              </div>
+              <div className={styles.inputWrapper}>
+                <textarea 
+                  placeholder="What's happening?"
+                  value={postContent}
+                  onChange={(e) => setPostContent(e.target.value)}
+                  maxLength={280}
+                />
+                <div className={styles.inputActions}>
+                  <div className={styles.mediaButtons}>
+                    <button type="button"><FaImage /></button>
+                    <button type="button"><FaGift /></button>
+                    <button type="button"><FaPoll /></button>
+                    <button type="button"><FaSmile /></button>
+                    <button type="button"><FaCalendar /></button>
+                  </div>
+                  <button 
+                    onClick={handlePostSubmit}
+                    className={styles.postButton}
+                    disabled={!postContent.trim() || isPosting}
+                  >
+                    Post
+                  </button>
                 </div>
-                <button 
-                  onClick={handlePostSubmit}
-                  className={styles.postButton}
-                  disabled={!postContent.trim() || isPosting}
-                >
-                  Post
-                </button>
               </div>
             </div>
-          </div>
-          
-          {/* Feed */}
-          <div className={styles.feed}>
-            {posts.map(post => (
-              <Link href={`/post/${post.postId}`} key={post.postId} className={styles.postLink}>
-                <div className={styles.post}>
-                  <div className={styles.postAvatar}>
-                    <img src={post.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'} alt={`${post.user.username}'s avatar`} />
-                  </div>
-                  <div className={styles.postContent}>
-                    <div className={styles.postHeader}>
-                      <span className={styles.postUsername}>{post.user.username}</span>
-                      <span className={styles.postHandle}>{post.handle}</span>
-                      <span className={styles.postTime}>· {post.time}</span>
+
+            {/* Feed */}
+            <div className={styles.feed}>
+              {posts.map(post => (
+                <Link href={`/post/${post.postId}`} key={post.postId} className={styles.postLink}>
+                  <div className={styles.post}>
+                    <div className={styles.postAvatar} onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      router.push(`/profile/${post.author}`);
+                    }}>
+                      <img src={post.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'} alt={`${post.user.username}'s avatar`} />
                     </div>
-                    <div className={styles.postText}>
-                      {post.content}
-                    </div>
-                    <div className={styles.postActions}>
-                      <button onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }}><FaComment /> <span>{post.comments.commentCount}</span></button>
-                      <button onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }}><FaRetweet /> <span>{post.reposts}</span></button>
-                      <button 
-                        onClick={(e) => {
+                    <div className={styles.postContent}>
+                      <div className={styles.postHeader}>
+                        <span 
+                          className={styles.postUsername}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            router.push(`/profile/${post.author}`);
+                          }}
+                        >{post.user.username}</span>
+                        <span className={styles.postHandle}>{post.handle}</span>
+                        <span className={styles.postTime}>· {post.time}</span>
+                      </div>
+                      <div className={styles.postText}>
+                        {post.content}
+                      </div>
+                      <div className={styles.postActions}>
+                        <button onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          handleLikePost(post.postId.toString());
-                        }}
-                        className={post.likes.likers.includes(activeWallet.address) ? styles.likedButton : ''}
-                      >
-                        <FaHeart /> <span>{post.likes.likeCount}</span>
-                      </button>
-                      <button onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }}><FaShareSquare /></button>
+                        }}><FaComment /> <span>{post.comments.commentCount}</span></button>
+                        <button onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}><FaRetweet /> <span>{post.reposts}</span></button>
+                        <button 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleLikePost(post.postId.toString());
+                          }}
+                          className={post.likes.likers.includes(activeWallet.address) ? styles.likedButton : ''}
+                        >
+                          <FaHeart /> <span>{post.likes.likeCount}</span>
+                        </button>
+                        <button onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}><FaShareSquare /></button>
+                      </div>
                     </div>
                   </div>
+                </Link>
+              ))}
+              
+              {/* Loading indicator */}
+              <div ref={loadingRef} className={styles.loadingIndicator}>
+                {isLoading && <div className={styles.spinner}>Loading...</div>}
+                {!hasMore && <div className={styles.noMorePosts}>No more posts</div>}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column - Navigation */}
+          <div className={styles.rightColumn}>
+            <div className={styles.postButtonLarge}>
+              <button>Post</button>
+            </div>
+            
+            {/* User Info Box */}
+            <div className={styles.userInfoBox}>
+              <div className={styles.userInfo}>
+                <div className={styles.userName}>
+                  {userData?.user?.username || 'nemo'}
                 </div>
-              </Link>
-            ))}
-            
-            {/* Loading indicator */}
-            <div ref={loadingRef} className={styles.loadingIndicator}>
-              {isLoading && <div className={styles.spinner}>Loading...</div>}
-              {!hasMore && <div className={styles.noMorePosts}>No more posts</div>}
-            </div>
-          </div>
-        </div>
-        
-        {/* Right Column - Navigation */}
-        <div className={styles.rightColumn}>
-          <nav className={styles.mainNav}>
-            <ul>
-              <li className={styles.active}><FaHome /> <span>Home</span></li>
-              <li><FaSearch /> <span>Explore</span></li>
-              <li><FaBell /> <span>Notifications</span></li>
-              <li><FaEnvelope /> <span>Messages</span></li>
-              <li><FaBookmark /> <span>Bookmarks</span></li>
-              <li><FaList /> <span>Lists</span></li>
-              <li><FaUser /> <span>Profile</span></li>
-              <li><FaEllipsisH /> <span>More</span></li>
-            </ul>
-          </nav>
-          
-          <div className={styles.postButtonLarge}>
-            <button>Post</button>
-          </div>
-          
-          {/* User Info Box */}
-          <div className={styles.userInfoBox}>
-            <div className={styles.userInfo}>
-              <div className={styles.userName}>
-                {userData?.user?.username || 'nemo'}
-              </div>
-              <div className={styles.userAddress}>
-                {activeWallet ? `${activeWallet.address.substring(0, 6)}...${activeWallet.address.substring(activeWallet.address.length - 4)}` : '0xD4D...604B'}
+                <div className={styles.userAddress}>
+                  {activeWallet ? `${activeWallet.address.substring(0, 6)}...${activeWallet.address.substring(activeWallet.address.length - 4)}` : '0xD4D...604B'}
+                </div>
               </div>
             </div>
-            
-            <button onClick={logout} className={styles.signOutButton}>
-              Sign Out
-            </button>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 } 

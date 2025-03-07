@@ -1,0 +1,498 @@
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0;
+  background-color: #000;
+  min-height: 100vh;
+  padding-top: 80px; /* Add space for fixed header */
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid #2f3336;
+}
+
+.headerContent {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+}
+
+.headerExpanded {
+  height: 60px;
+}
+
+.headerCollapsed {
+  height: 50px;
+}
+
+.nav {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.navItem {
+  color: #71767b;
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  font-size: 1rem;
+}
+
+.navItem:hover {
+  color: #fff;
+}
+
+.navItem.active {
+  color: #fff;
+  font-weight: bold;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: #fff;
+  font-size: 1.2rem;
+}
+
+.profileHeader {
+  border-bottom: 1px solid #2f3336;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.coverImage {
+  height: 200px;
+  overflow: hidden;
+  position: relative;
+}
+
+.coverImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profileInfo {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  margin-top: -60px; /* Increased negative margin to overlap more with cover image */
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.profileAvatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 4px solid #000;
+  overflow: hidden;
+  background-color: #000;
+  margin-bottom: 10px;
+}
+
+.profileAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.editableAvatar {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.avatarOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0.3; /* Make it slightly visible by default */
+  transition: opacity 0.2s;
+}
+
+.avatarOverlay svg {
+  font-size: 2rem;
+  color: white;
+  margin-bottom: 5px;
+}
+
+.avatarOverlay::after {
+  content: 'Change photo';
+  color: white;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.editableAvatar:hover .avatarOverlay {
+  opacity: 1;
+}
+
+.profileActions {
+  margin-top: 60px;
+}
+
+.editButton, .saveButton, .cancelButton {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.editButton {
+  background-color: transparent;
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+.editButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.saveButton {
+  background-color: #1d9bf0;
+  color: #fff;
+  border: none;
+  margin-left: 10px;
+}
+
+.saveButton:hover {
+  background-color: #1a8cd8;
+}
+
+.cancelButton {
+  background-color: transparent;
+  color: #fff;
+  border: 1px solid #2f3336;
+}
+
+.cancelButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.profileDetails {
+  padding: 0 20px 20px;
+  margin-top: 30px; /* Add margin to create space between avatar and details */
+}
+
+.profileName {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+  margin: 0 0 5px;
+}
+
+.profileBio {
+  color: #fff;
+  margin: 0 0 15px;
+  line-height: 1.5;
+}
+
+.profileMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 15px;
+  color: #71767b;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.metaItem a {
+  color: #1d9bf0;
+  text-decoration: none;
+}
+
+.metaItem a:hover {
+  text-decoration: underline;
+}
+
+.profileStats {
+  display: flex;
+  gap: 20px;
+}
+
+.statItem {
+  display: flex;
+  gap: 5px;
+}
+
+.statValue {
+  color: #fff;
+  font-weight: bold;
+}
+
+.statLabel {
+  color: #71767b;
+}
+
+.editForm {
+  padding: 0 20px 20px;
+}
+
+.formGroup {
+  margin-bottom: 15px;
+}
+
+.formGroup label {
+  display: block;
+  color: #71767b;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+}
+
+.formGroup input, .formGroup textarea {
+  width: 100%;
+  padding: 10px;
+  background-color: #000;
+  border: 1px solid #2f3336;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.formGroup textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.formGroup input:focus, .formGroup textarea:focus {
+  outline: none;
+  border-color: #1d9bf0;
+}
+
+.profileTabs {
+  display: flex;
+  border-bottom: 1px solid #2f3336;
+}
+
+.tabButton {
+  flex: 1;
+  background: none;
+  border: none;
+  color: #71767b;
+  padding: 15px 0;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.2s;
+  position: relative;
+}
+
+.tabButton:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.tabButton.active {
+  color: #fff;
+}
+
+.tabButton.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 4px;
+  background-color: #1d9bf0;
+  border-radius: 2px;
+}
+
+.userPosts {
+  padding: 0;
+}
+
+.noPosts {
+  padding: 40px 20px;
+  text-align: center;
+  color: #71767b;
+}
+
+.noPosts p {
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+
+.createPostLink {
+  color: #1d9bf0;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.createPostLink:hover {
+  text-decoration: underline;
+}
+
+.postLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.2s;
+}
+
+.postLink:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.post {
+  display: flex;
+  padding: 20px;
+  border-bottom: 1px solid #2f3336;
+}
+
+.postAvatar {
+  margin-right: 15px;
+}
+
+.postAvatar img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.postContent {
+  flex: 1;
+}
+
+.postHeader {
+  margin-bottom: 10px;
+}
+
+.postUsername {
+  font-weight: bold;
+  color: #fff;
+  margin-right: 5px;
+}
+
+.postHandle, .postTime {
+  color: #71767b;
+  margin-right: 5px;
+}
+
+.postText {
+  color: #fff;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.postActions {
+  display: flex;
+  gap: 20px;
+}
+
+.postActions button {
+  background: none;
+  border: none;
+  color: #71767b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px;
+  transition: color 0.2s;
+}
+
+.postActions button:hover {
+  color: #1d9bf0;
+}
+
+.likedButton {
+  color: #f91880 !important;
+}
+
+.likedButton svg {
+  fill: #f91880;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  margin-bottom: 20px;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: color 0.2s;
+}
+
+.backButton:hover {
+  color: #1d9bf0;
+}
+
+.backButton svg {
+  font-size: 1.2rem;
+}
+
+.changePhotoButton {
+  background-color: #1d9bf0;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.2s;
+}
+
+.changePhotoButton:hover {
+  background-color: #1a8cd8;
+}
+
+.profileAvatarEditable {
+  width: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.profileAvatarEditable .editableAvatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 4px solid #000;
+  overflow: hidden;
+  background-color: #000;
+} 

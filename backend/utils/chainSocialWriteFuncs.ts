@@ -214,3 +214,27 @@ export async function addComment(postId: number, content: string) {
     };
   }
 }
+
+export async function updateUser(bio: string, pfpLink: string) {
+  try {
+    // const chainSocialContract = getChainSocialContract();
+
+    const txData = encodeFunctionData({
+      abi: ChainSocialABI,
+      functionName: 'updateProfile',
+      args: [bio, pfpLink]
+    });
+
+    return {
+      transactionData: txData,
+      estimatedGas: '0',
+      contractAddress: CHAIN_SOCIAL_ADDRESS,
+    };
+  } catch (error) {
+    console.error('Error updating user:', error);
+    return {
+      success: false,
+      error: (error as Error).message
+    };
+  }
+}

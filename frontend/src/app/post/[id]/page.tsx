@@ -3,10 +3,11 @@
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { useState, useEffect } from 'react';
 import styles from './PostPage.module.css';
-import { FaComment, FaRetweet, FaHeart, FaShareSquare, FaImage, FaGift, FaPoll, FaSmile, FaCalendar, FaArrowLeft } from 'react-icons/fa';
+import { FaComment, FaRetweet, FaHeart, FaShareSquare, FaImage, FaGift, FaPoll, FaSmile, FaCalendar, FaArrowLeft, FaHome, FaEdit, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface Post {
   id: number;
@@ -34,13 +35,23 @@ interface Post {
 
 export default function PostPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const { user } = usePrivy();
+  const { user, logout } = usePrivy();
   const { wallets } = useWallets();
   const [post, setPost] = useState<Post | null>(null);
   const [commentContent, setCommentContent] = useState('');
   const [isPosting, setIsPosting] = useState(false);
   const [userData, setUserData] = useState<any>(null);
+  const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
   const activeWallet = wallets[0];
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsHeaderCollapsed(window.scrollY > 60);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -141,101 +152,128 @@ export default function PostPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className={styles.container}>
-      <ToastContainer theme="dark" />
-      
-      {/* Back Button */}
-      <button 
-        className={styles.backButton}
-        onClick={() => router.push('/')}
-      >
-        <FaArrowLeft />
-        Back to Feed
-      </button>
-      
-      {/* Main Post */}
-      <div className={styles.post}>
-        <div className={styles.postAvatar}>
-          <img src={post.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'} alt={`${post.user.username}'s avatar`} />
-        </div>
-        <div className={styles.postContent}>
-          <div className={styles.postHeader}>
-            <span className={styles.postUsername}>{post.user.username}</span>
-            <span className={styles.postHandle}>{post.handle}</span>
-            <span className={styles.postTime}>· {post.time}</span>
-          </div>
-          <div className={styles.postText}>
-            {post.content}
-          </div>
-          <div className={styles.postActions}>
-            <button><FaComment /> <span>{post.comments.commentCount}</span></button>
-            <button><FaRetweet /> <span>{post.reposts}</span></button>
-            <button><FaHeart /> <span>{post.likes.likeCount}</span></button>
-            <button><FaShareSquare /></button>
-          </div>
-        </div>
-      </div>
-
-      {/* Comment Input */}
-      <div className={styles.commentInput}>
-        <div className={styles.userAvatar}>
-          <img 
-            src={userData?.user?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'} 
-            alt="Your avatar" 
-          />
-        </div>
-        <div className={styles.inputWrapper}>
-          <textarea 
-            placeholder="Write a comment..."
-            value={commentContent}
-            onChange={(e) => setCommentContent(e.target.value)}
-            maxLength={280}
-          />
-          <div className={styles.inputActions}>
-            <div className={styles.mediaButtons}>
-              <button type="button"><FaImage /></button>
-              <button type="button"><FaGift /></button>
-              <button type="button"><FaPoll /></button>
-              <button type="button"><FaSmile /></button>
-              <button type="button"><FaCalendar /></button>
-            </div>
-            <button 
-              onClick={handleCommentSubmit}
-              className={styles.commentButton}
-              disabled={!commentContent.trim() || isPosting}
-            >
-              Comment
+    <>
+      {/* Fixed Header */}
+      <header className={`${styles.header} ${isHeaderCollapsed ? styles.headerCollapsed : styles.headerExpanded}`}>
+        <div className={styles.headerContent}>
+          <nav className={styles.nav}>
+            <Link href="/" className={styles.navItem}>
+              <FaHome /> {!isHeaderCollapsed && "Home"}
+            </Link>
+            <Link href="/create" className={styles.navItem}>
+              <FaEdit /> {!isHeaderCollapsed && "Post"}
+            </Link>
+            <Link href={activeWallet ? `/profile/${activeWallet.address}` : "/profile"} className={styles.navItem}>
+              <FaUser /> {!isHeaderCollapsed && "Profile"}
+            </Link>
+            <button onClick={logout} className={styles.navItem}>
+              <FaSignOutAlt /> {!isHeaderCollapsed && "Logout"}
             </button>
+          </nav>
+        </div>
+      </header>
+
+      <div className={styles.container}>
+        <ToastContainer theme="dark" />
+        
+        <button 
+          className={styles.backButton}
+          onClick={() => router.push('/')}
+        >
+          <FaArrowLeft />
+          Back to Feed
+        </button>
+        
+        {/* Main Post */}
+        <div className={styles.post}>
+          <div 
+            className={styles.postAvatar}
+            onClick={() => router.push(`/profile/${post.user.id}`)}
+          >
+            <img src={post.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'} alt={`${post.user.username}'s avatar`} />
+          </div>
+          <div className={styles.postContent}>
+            <div className={styles.postHeader}>
+              <span 
+                className={styles.postUsername}
+                onClick={() => router.push(`/profile/${post.user.id}`)}
+              >{post.user.username}</span>
+              <span className={styles.postHandle}>{post.handle}</span>
+              <span className={styles.postTime}>· {post.time}</span>
+            </div>
+            <div className={styles.postText}>
+              {post.content}
+            </div>
+            <div className={styles.postActions}>
+              <button><FaComment /> <span>{post.comments.commentCount}</span></button>
+              <button><FaRetweet /> <span>{post.reposts}</span></button>
+              <button><FaHeart /> <span>{post.likes.likeCount}</span></button>
+              <button><FaShareSquare /></button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Comments Section */}
-      <div className={styles.commentsSection}>
-        <h2>Comments</h2>
-        {post.comments.comments.length === 0 ? (
-          <div className={styles.noComments}>
-            Be the first to comment
+        {/* Comment Input */}
+        <div className={styles.commentInput}>
+          <div className={styles.userAvatar}>
+            <img 
+              src={userData?.user?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'} 
+              alt="Your avatar" 
+            />
           </div>
-        ) : (
-          post.comments.comments.map((comment, index) => (
-            <div key={index} className={styles.comment}>
-              <div className={styles.commentAvatar}>
-                <img src={post.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'} alt="User avatar" />
+          <div className={styles.inputWrapper}>
+            <textarea 
+              placeholder="Write a comment..."
+              value={commentContent}
+              onChange={(e) => setCommentContent(e.target.value)}
+              maxLength={280}
+            />
+            <div className={styles.inputActions}>
+              <div className={styles.mediaButtons}>
+                <button type="button"><FaImage /></button>
+                <button type="button"><FaGift /></button>
+                <button type="button"><FaPoll /></button>
+                <button type="button"><FaSmile /></button>
+                <button type="button"><FaCalendar /></button>
               </div>
-              <div className={styles.commentContent}>
-                <div className={styles.commentHeader}>
-                  <span className={styles.commentUsername}>{post.comments.commenters[index]}</span>
-                  <span className={styles.commentTime}>{post.time}</span>
-                </div>
-                <div className={styles.commentText}>
-                  {comment}
-                </div>
-              </div>
+              <button 
+                onClick={handleCommentSubmit}
+                className={styles.commentButton}
+                disabled={!commentContent.trim() || isPosting}
+              >
+                Comment
+              </button>
             </div>
-          ))
-        )}
+          </div>
+        </div>
+
+        {/* Comments Section */}
+        <div className={styles.commentsSection}>
+          <h2>Comments</h2>
+          {post.comments.comments.length === 0 ? (
+            <div className={styles.noComments}>
+              Be the first to comment
+            </div>
+          ) : (
+            post.comments.comments.map((comment, index) => (
+              <div key={index} className={styles.comment}>
+                <div className={styles.commentAvatar}>
+                  <img src={post.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'} alt="User avatar" />
+                </div>
+                <div className={styles.commentContent}>
+                  <div className={styles.commentHeader}>
+                    <span className={styles.commentUsername}>{post.comments.commenters[index]}</span>
+                    <span className={styles.commentTime}>{post.time}</span>
+                  </div>
+                  <div className={styles.commentText}>
+                    {comment}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 } 
