@@ -304,16 +304,16 @@ export function Dashboard() {
         <div className={styles.headerContent}>
           <nav className={styles.nav}>
             <Link href="/" className={`${styles.navItem} ${styles.active}`}>
-              <FaHome /> {!isHeaderCollapsed && "Home"}
+              <FaHome size={18} /> {!isHeaderCollapsed && "Home"}
             </Link>
             <Link href="/create" className={styles.navItem}>
-              <FaEdit /> {!isHeaderCollapsed && "Post"}
+              <FaEdit size={18} /> {!isHeaderCollapsed && "Post"}
             </Link>
             <Link href="/profile" className={styles.navItem}>
-              <FaUser /> {!isHeaderCollapsed && "Profile"}
+              <FaUser size={18} /> {!isHeaderCollapsed && "Profile"}
             </Link>
             <button onClick={logout} className={styles.navItem}>
-              <FaSignOutAlt /> {!isHeaderCollapsed && "Logout"}
+              <FaSignOutAlt size={18} /> {!isHeaderCollapsed && "Logout"}
             </button>
           </nav>
         </div>
@@ -323,8 +323,23 @@ export function Dashboard() {
         <ToastContainer theme="dark" />
         
         <div className={styles.mainContainer}>
-          {/* Left Column - Home label */}
-          <div className={styles.leftColumn}>
+          {/* Left Column - User Info */}
+          <div className={styles.leftSidebarColumn}>
+            {/* User Info Box */}
+            <div className={styles.userInfoBox}>
+              <div className={styles.userInfo}>
+                <div className={styles.userName}>
+                  {userData?.user?.username || 'nemo'}
+                </div>
+                <div className={styles.userAddress}>
+                  {activeWallet ? `${activeWallet.address.substring(0, 6)}...${activeWallet.address.substring(activeWallet.address.length - 4)}` : '0xD4D...604B'}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Center Column - Home and Feed */}
+          <div className={styles.centerColumn}>
             <div className={styles.homeLabel}>
               <h2>Home</h2>
             </div>
@@ -428,23 +443,9 @@ export function Dashboard() {
             </div>
           </div>
 
-          {/* Right Column - Navigation */}
-          <div className={styles.rightColumn}>
-            <div className={styles.postButtonLarge}>
-              <button>Post</button>
-            </div>
-            
-            {/* User Info Box */}
-            <div className={styles.userInfoBox}>
-              <div className={styles.userInfo}>
-                <div className={styles.userName}>
-                  {userData?.user?.username || 'nemo'}
-                </div>
-                <div className={styles.userAddress}>
-                  {activeWallet ? `${activeWallet.address.substring(0, 6)}...${activeWallet.address.substring(activeWallet.address.length - 4)}` : '0xD4D...604B'}
-                </div>
-              </div>
-            </div>
+          {/* Right Column - Empty */}
+          <div className={styles.rightSidebarColumn}>
+            {/* This column is intentionally left empty */}
           </div>
         </div>
       </div>

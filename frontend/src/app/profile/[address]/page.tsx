@@ -240,16 +240,16 @@ export default function UserProfilePage({ params }: { params: { address: string 
         <div className={styles.headerContent}>
           <nav className={styles.nav}>
             <Link href="/" className={styles.navItem}>
-              <FaHome /> {!isHeaderCollapsed && "Home"}
+              <FaHome size={18} /> {!isHeaderCollapsed && "Home"}
             </Link>
             <Link href="/create" className={styles.navItem}>
-              <FaEdit /> {!isHeaderCollapsed && "Post"}
+              <FaEdit size={18} /> {!isHeaderCollapsed && "Post"}
             </Link>
             <Link href={activeWallet ? `/profile/${activeWallet.address}` : "/profile"} className={`${styles.navItem} ${styles.active}`}>
-              <FaUser /> {!isHeaderCollapsed && "Profile"}
+              <FaUser size={18} /> {!isHeaderCollapsed && "Profile"}
             </Link>
             <button onClick={logout} className={styles.navItem}>
-              <FaSignOutAlt /> {!isHeaderCollapsed && "Logout"}
+              <FaSignOutAlt size={18} /> {!isHeaderCollapsed && "Logout"}
             </button>
           </nav>
         </div>
