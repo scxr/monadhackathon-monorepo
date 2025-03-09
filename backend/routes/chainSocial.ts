@@ -151,7 +151,8 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
     try {
       console.log('Creating post...');  
       const { content, userAddress } = body as { content: string; userAddress: string };
-      
+      console.log("content: ", content)
+      console.log("userAddress: ", userAddress)
       if (!content) {
         return { 
           error: 'Missing required parameters', 

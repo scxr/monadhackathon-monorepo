@@ -127,13 +127,23 @@ export async function simulateCreatePost(userAddress: string, content: string) {
     const txData = encodeFunctionData({
       abi: ChainSocialABI,
       functionName: 'createPost',
-      args: [content]
+      args: [content],
     });
+
+    // simulate the post creation to get gas estimation
+    const gasEstimation = await publicClient.estimateGas({
+      to: CHAIN_SOCIAL_ADDRESS,
+      data: txData,
+      account: userAddress as `0x${string}`,
+    });
+
+    console.log('Gas estimation:', gasEstimation);
+    
     
     return {
       post: simulatedPost,
       transactionData: txData,
-      estimatedGas: '0', // You could add gas estimation here if needed
+      estimatedGas: Math.ceil(Number(gasEstimation) * 1.1).toString(),
       contractAddress: CHAIN_SOCIAL_ADDRESS,
       from: userAddress
     };

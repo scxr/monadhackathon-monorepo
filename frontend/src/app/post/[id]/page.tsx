@@ -100,7 +100,7 @@ export default function PostPage({ params }: { params: { id: string } }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ content: commentContent }),
+        body: JSON.stringify({ content: commentContent, userAddress: activeWallet.address }),
       });
 
       if (!response.ok) {

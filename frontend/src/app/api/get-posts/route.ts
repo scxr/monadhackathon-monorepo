@@ -9,7 +9,6 @@ export async function GET(req: Request) {
 
     const posts = await fetch(`http://localhost:3000/data/posts-with-offset-and-limit/${offset}/${limit}`)
     const data = await posts.json();
-    console.log(data);
     return NextResponse.json(data);
   } catch (error) {
     console.error('Error fetching posts:', error);

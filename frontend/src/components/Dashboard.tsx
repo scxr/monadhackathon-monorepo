@@ -191,10 +191,10 @@ export function Dashboard() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ content: postContent }),
+        body: JSON.stringify({ content: postContent, author: activeWallet.address }),
       });
       let data = await response.json();
-      console.log(data);
+      console.log(`Post created: ${JSON.stringify(data)}`);
       const provider = await activeWallet.getEthereumProvider();
       const txHash = await provider.request({
         method: 'eth_sendTransaction',
@@ -203,7 +203,7 @@ export function Dashboard() {
           value: "0x0",
           data: data.data,
           from: activeWallet.address,
-          gasLimit: 175000
+          gasLimit: data.gasEstimate
         }],
       });
       console.log("Transaction sent:", txHash);

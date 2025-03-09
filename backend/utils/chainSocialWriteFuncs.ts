@@ -45,6 +45,9 @@ export async function simulateCreateUser(userAddress: string, username: string, 
       args: [username, bio, pfpLink]
     });
 
+    //simulate
+    
+
     return {
       user: simulatedUser,
       transactionData: txData,

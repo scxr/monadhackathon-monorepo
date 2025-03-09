@@ -6,7 +6,7 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
-    const { content } = body;
+    const { content, author } = body;
 
     if (!content) {
       return NextResponse.json({ error: 'Content is required' }, { status: 400 });
@@ -19,17 +19,19 @@ export async function POST(req: Request) {
       },
       body: JSON.stringify({
         content: content,
+        userAddress: author,
       }),
     });
 
-    console.log(response);
+    
 
     const data = await response.json();
-
+    console.log(`Post created: ${JSON.stringify(data)}`);
    
     return NextResponse.json({ 
       success: true, 
-      data: data.transactionData
+      data: data.transactionData,
+      gasEstimate: data.estimatedGas
     });
   } catch (error) {
     console.error('Error creating post:', error);
@@ -55,7 +57,7 @@ export async function GET(req: Request) {
     });
 
     const data = await response.json();
-
+    console.log(`Post confirmed: ${JSON.stringify(data)}`);
     return NextResponse.json({ 
       success: true, 
       data: data.transactionData

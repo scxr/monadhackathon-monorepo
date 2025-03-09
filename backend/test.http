@@ -27,3 +27,11 @@ Content-Type: application/json
 GET http://localhost:3000/data/post/422
 ###
 GET http://localhost:3000/data/user-posts/0xC7A0c405DF55943E37d76B1E3c67FdD6518b26f3
+###
+POST http://localhost:3000/chain-social/simulate/create-post
+Content-Type: application/json
+
+{
+  "content": "Hello, world!",
+  "userAddress": "0x4c2e0165ca1123608cff84f7805b6c57be9c3813"
+}
