@@ -23,7 +23,7 @@ export async function POST(
     }
     
     
-    let response = await fetch(`http://localhost:3000/chain-social/simulate/follow-user/${address}`, {
+    let response = await fetch(`http://spirited-nourishment-production-8fb5.up.railway.app/chain-social/simulate/follow-user/${address}`, {
       method: 'GET',
     })
     
@@ -59,7 +59,7 @@ export async function GET(
     const url = new URL(request.url);
     const followerAddress = url.searchParams.get('followerAddress');
     
-    let response = await fetch(`http://localhost:3000/data/following/${followerAddress}`, {
+    let response = await fetch(`http://spirited-nourishment-production-8fb5.up.railway.app/data/following/${followerAddress}`, {
       method: 'GET',
     })
     

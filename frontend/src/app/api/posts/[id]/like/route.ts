@@ -8,7 +8,7 @@ export async function POST(
 ) {
   try {
     const { postId } = await req.json();
-    let response = await fetch(`http://localhost:3000/chain-social/simulate/like-post`, {
+    let response = await fetch(`http://spirited-nourishment-production-8fb5.up.railway.app/chain-social/simulate/like-post`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

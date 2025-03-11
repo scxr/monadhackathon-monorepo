@@ -16,7 +16,7 @@ export async function GET(request: Request) {
 
     console.log(`Fetching following posts for user: ${userAddress}, offset: ${offset}, limit: ${limit}`);
 
-    let response = await fetch(`http://localhost:3000/data/following-posts/${userAddress}`)
+    let response = await fetch(`http://spirited-nourishment-production-8fb5.up.railway.app/data/following-posts/${userAddress}`)
     let postsData = await response.json()
     return NextResponse.json(postsData);
   } catch (error) {

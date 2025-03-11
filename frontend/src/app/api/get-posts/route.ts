@@ -7,7 +7,7 @@ export async function GET(req: Request) {
     const offset = parseInt(searchParams.get('offset') || '0', 10);
     const limit = parseInt(searchParams.get('limit') || '20', 10);
 
-    const posts = await fetch(`http://localhost:3000/data/posts-with-offset-and-limit/${offset}/${limit}`)
+    const posts = await fetch(`http://spirited-nourishment-production-8fb5.up.railway.app/data/posts-with-offset-and-limit/${offset}/${limit}`)
     const data = await posts.json();
     return NextResponse.json(data);
   } catch (error) {

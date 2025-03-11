@@ -9,8 +9,8 @@ export async function GET(
   try {
     // await params
     const {address} = await params;
-    console.log(`http://localhost:3000/chain-social/user/${address}`);
-    const response = await fetch(`http://localhost:3000/chain-social/user/${address}`);
+    console.log(`http://spirited-nourishment-production-8fb5.up.railway.app/chain-social/user/${address}`);
+    const response = await fetch(`http://spirited-nourishment-production-8fb5.up.railway.app/chain-social/user/${address}`);
     
     console.log(response);
     if (response.status !== 200) {

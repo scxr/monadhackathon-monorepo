@@ -9,7 +9,7 @@ export async function GET(request: Request, { params }: { params: { address: str
 export async function POST(request: Request) {
     const { address, followerAddress } = await request.json();
 
-    let response = await fetch(`http://localhost:3000/chain-social/simulate/unfollow-user`, {
+    let response = await fetch(`http://spirited-nourishment-production-8fb5.up.railway.app/chain-social/simulate/unfollow-user`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

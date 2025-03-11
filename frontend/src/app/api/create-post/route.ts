@@ -12,7 +12,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Content is required' }, { status: 400 });
     }
 
-    const response = await fetch(`http://localhost:3000/chain-social/simulate/create-post`, {
+    const response = await fetch(`http://spirited-nourishment-production-8fb5.up.railway.app/chain-social/simulate/create-post`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ export async function GET(req: Request) {
   try {
     let params = new URL(req.url).searchParams;
     let txn = params.get('txn');
-    const response = await fetch(`http://localhost:3000/chain-social/confirm/create-post`, {
+    const response = await fetch(`http://spirited-nourishment-production-8fb5.up.railway.app/chain-social/confirm/create-post`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

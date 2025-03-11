@@ -9,7 +9,7 @@ export async function GET(
     const { id } = await context.params;
     
     // Get post data
-    const post = await fetch(`http://localhost:3000/data/post/${id}`);
+    const post = await fetch(`http://spirited-nourishment-production-8fb5.up.railway.app/data/post/${id}`);
     const postData = await post.json();
 
     if (!postData) {
