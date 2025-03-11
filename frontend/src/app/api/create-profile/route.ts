@@ -5,8 +5,8 @@ export async function POST(request: Request) {
     console.log("Creating profile");
     // Parse the request body
     const body = await request.json();
-    const { walletAddress, username, bio, avatar } = body;
-    
+    const { walletAddress, username, bio, b64image } = body;
+
     // Validate required fields
     if (!walletAddress || !username) {
       return NextResponse.json(
@@ -25,9 +25,19 @@ export async function POST(request: Request) {
         userAddress: walletAddress,
         username,
         bio,
-        pfpLink: "https://placeholder.com",
+        pfpImage: b64image
       }),
     });
+
+    // console.log("Response", JSON.stringify({
+    //     userAddress: walletAddress,
+    //     username,
+    //     bio,
+    //     pfpImage: b64image
+    //   })
+    // );
+
+    
     
     // Check if the request was successful
     if (!response.ok) {

@@ -1,3 +1,6 @@
+import { getUser } from "./chainSocialViewFuncs";
+import { userCache } from './cache';
+
 const indexer_endpoint = process.env.GQL_ENDPOINT || 'http://157.245.35.199/v1/graphql';
 
 export async function getAllPosts() {
@@ -147,33 +150,85 @@ export async function getUserPosts(userAddress: string) {
 export async function getUsers(users: String[]) {
     try {
         let start = Date.now();
-        const response = await fetch(indexer_endpoint as string, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-hasura-admin-secret': 'testing'
-            },
-            body: JSON.stringify({ query: `{
-                ChainSocial_UserCreated(where: {userAddress: {_in: ${JSON.stringify(users)}}}) {
-                    id
-                    username
-                    userAddress
-                }
-            }` })
-        });
+        let cacheHits = 0;
+        
+        // const response = await fetch(indexer_endpoint as string, {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //         'x-hasura-admin-secret': 'testing'
+        //     },
+        //     body: JSON.stringify({ query: `{
+        //         ChainSocial_UserCreated(where: {userAddress: {_in: ${JSON.stringify(users)}}}) {
+        //             id
+        //             username
+        //             userAddress
+        //         }
+        //     }` })
+        // });
 
-        const data = await response.json();
-        if (!data.data?.ChainSocial_UserCreated) {
-            throw new Error('Failed to fetch users');
+        // const data = await response.json();
+        // if (!data.data?.ChainSocial_UserCreated) {
+        //     throw new Error('Failed to fetch users');
+        // }
+
+        // const userData: { [key: string]: any } = {};
+        let userDataTwo: { [key: string]: {
+            username: string,
+            bio: string,
+            pfpLink: string,
+            joinedAt: string,
+            exists: boolean
+        } } = {}
+        
+        // Batch processing in groups of 5
+        const batchSize = 5;
+        for (let i = 0; i < users.length; i += batchSize) {
+            // Get the current batch (either 5 or remainder)
+            const batch = users.slice(i, i + batchSize);
+            
+            // Check which users are already in cache
+            const batchWithCacheStatus = batch.map(user => {
+                const userStr = user as string;
+                const isCached = userCache.get(userStr) !== undefined;
+                if (isCached) cacheHits++;
+                return { userStr, isCached };
+            });
+            
+            // Only fetch users that are not in cache
+            const usersToFetch = batchWithCacheStatus
+                .filter(item => !item.isCached)
+                .map(item => item.userStr);
+            
+            // Process non-cached users in parallel
+            if (usersToFetch.length > 0) {
+                const batchResults = await Promise.all(
+                    usersToFetch.map(user => getUser(user))
+                );
+                
+                // Add results to userDataTwo (cache is updated in getUser)
+                usersToFetch.forEach((user, index) => {
+                    userDataTwo[user] = batchResults[index];
+                });
+            }
+            
+            // Add cached results to userDataTwo
+            batchWithCacheStatus
+                .filter(item => item.isCached)
+                .forEach(item => {
+                    userDataTwo[item.userStr] = userCache.get(item.userStr);
+                });
         }
+        
+        // data.data.ChainSocial_UserCreated.forEach((user: any) => {
+        //     userData[user.userAddress] = user;  
+        // });
 
-        const userData: { [key: string]: any } = {};
-        data.data.ChainSocial_UserCreated.forEach((user: any) => {
-            userData[user.userAddress] = user;  
-        });
+        // console.log(userDataTwo);
 
-        console.log(`Time taken: ${Date.now() - start}ms`);
-        return userData;
+        console.log(`Time taken: ${Date.now() - start}ms, Cache hits: ${cacheHits}/${users.length}`);
+        return userDataTwo;
+        // return userData;
     } catch (error) {
         console.error('Error in getUsers:', error);
         throw error;
@@ -388,6 +443,89 @@ export async function getFollowing(userAddress: string) {
     return {
         following: followingUsers,
         unfollowed: unfollowedUsers
+    }
+}
+
+export async function getPostsByUsers(userAddresses: string[]) {
+    try {
+        let start = Date.now();
+        // Get posts from specified users
+        const postsResponse = await fetch(
+            indexer_endpoint as string,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-hasura-admin-secret": "testing"
+                },
+                body: JSON.stringify({ query: `{
+                    ChainSocial_PostCreated(where: {author: {_in: ${JSON.stringify(userAddresses)}}}, order_by: {postId: desc}) {
+                        id
+                        content
+                        author
+                        postId
+                    }
+                }` })
+            }
+        );
+
+        const postsData = await postsResponse.json();
+        if (!postsData.data?.ChainSocial_PostCreated) {
+            throw new Error('Failed to fetch posts');
+        }
+
+        const posts = postsData.data.ChainSocial_PostCreated;
+        if (posts.length === 0) {
+            return [];
+        }
+
+        const postIds = posts.map((post: any) => post.postId);
+
+        // Batch fetch users, likes, and comments in parallel
+        const [users, likes, comments] = await Promise.all([
+            getUsers(userAddresses as string[]),
+            getPostLikes(postIds),
+            getPostComments(postIds)
+        ]);
+
+        // Map the data together
+        const postsWithDetails = posts.map((post: any) => ({
+            ...post,
+            user: users[post.author] || { username: post.author.slice(0, 6) + '...' },
+            likes: likes?.[post.postId] || {
+                likeCount: 0,
+                likers: []
+            },
+            comments: comments?.[post.postId] || {
+                commentCount: 0,
+                commenters: [],
+                comments: []
+            }
+        }));
+
+        console.log(`Time taken for getPostsByUsers: ${Date.now() - start}ms`);
+        return postsWithDetails;
+    } catch (error) {
+        console.error('Error in getPostsByUsers:', error);
+        throw error;
+    }
+}
+
+export async function getFollowingPosts(userAddress: string) {
+    try {
+        const following = await getFollowing(userAddress);
+        
+        // If not following anyone, return empty array
+        if (!following.following || following.following.length === 0) {
+            return [];
+        }
+        
+        // Get posts from all followed users
+        const followingPosts = await getPostsByUsers(following.following);
+        return followingPosts;
+    } catch (error) {
+        console.error('Error in getFollowingPosts:', error);
+        throw error;
     }
 }
 

@@ -36,7 +36,7 @@ ChainSocial.Followed.handler(async ({event, context}) => {
 
 
 ChainSocial.PostCreated.handler(async ({event, context}) => {
-
+  console.log(JSON.stringify(event, null, 2))
   const entity = {
     id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
     postId: event.params.postId,
@@ -72,6 +72,7 @@ ChainSocial.Unfollowed.handler(async ({event, context}) => {
 
 
 ChainSocial.UserCreated.handler(async ({event, context}) => {
+  console.log(JSON.stringify(event, null, 2))
   const entity = {
     id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
     userAddress: event.params.userAddress,

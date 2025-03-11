@@ -24,6 +24,9 @@ export const indexerReqsRoutes = new Elysia({ prefix: '/data' })
     .get('/following/:address', async ({ params }) => {
         return await indexerReqs.getFollowing(params.address);
     })
+    .get('/following-posts/:address', async ({ params }) => {
+        return await indexerReqs.getFollowingPosts(params.address);
+    })
     .get('/user-posts/:address', async ({ params }) => {
         return await indexerReqs.getUserPosts(params.address);
     });

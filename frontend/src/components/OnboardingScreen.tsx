@@ -143,8 +143,24 @@ export function OnboardingScreen() {
     
     try {
       let avatarUrl = '';
+      let b64image = '';
+      
+      // If there's an image file, read it and wait for completion
       if (imageFile) {
         avatarUrl = profileImage || '';
+        
+        // Create a promise to handle the FileReader asynchronously
+        b64image = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            resolve(reader.result as string);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(imageFile);
+        }); 
+      } else {
+        alert('No image selected');
+        return;
       }
       
       const response = await fetch('/api/create-profile', {
@@ -157,6 +173,7 @@ export function OnboardingScreen() {
           username: username.trim(),
           bio: bio.trim() || 'New MonadSocial user',
           avatar: avatarUrl || 'https://placeholder.com',
+          b64image: b64image
         }),
       });
       
@@ -175,7 +192,7 @@ export function OnboardingScreen() {
             value: "0x0",
             data: data.transactionData,
             from: activeWallet.address,
-            gasLimit: 175000
+            gasLimit: data.estimatedGas
           }]
         });
         console.log("Transaction sent:", txHash);

@@ -127,7 +127,7 @@
 
 /* Center Column - Home and Feed */
 .centerColumn {
-  width: 600px;
+  width: 60%;
   border-right: 1px solid #2f3336;
   border-left: 1px solid #2f3336;
   display: flex;
@@ -873,4 +873,58 @@
   border-right: 10px solid transparent;
   border-top: 10px solid #15181c;
   z-index: 1001;
+}
+
+/* Feed Toggle */
+.feedToggle {
+  display: flex;
+  border-bottom: 1px solid #2f3336;
+  margin-top: 10px;
+  position: relative;
+}
+
+.toggleButton {
+  flex: 1;
+  background: transparent;
+  color: #8899a6;
+  border: none;
+  padding: 15px 0;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.2s;
+  position: relative;
+}
+
+.toggleButton:hover {
+  color: #1d9bf0;
+  background-color: rgba(29, 155, 240, 0.1);
+}
+
+.toggleButton.active {
+  color: #fff;
+}
+
+.toggleButton.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 4px;
+  background-color: #1d9bf0;
+  border-radius: 4px 4px 0 0;
+}
+
+.noPostsMessage {
+  text-align: center;
+  padding: 40px 20px;
+  color: #8899a6;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.feed {
+  margin-top: 10px;
 } 

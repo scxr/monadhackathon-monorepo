@@ -26,11 +26,13 @@ interface Post {
   user: {
     username: string;
     id: string;
+    pfpLink: string;
   }
   likes: {
     likeCount: number;
     likers: string[];
   }
+  author: string;
 }
 
 export default function PostPage({ params }: { params: { id: string } }) {
@@ -188,15 +190,15 @@ export default function PostPage({ params }: { params: { id: string } }) {
         <div className={styles.post}>
           <div 
             className={styles.postAvatar}
-            onClick={() => router.push(`/profile/${post.user.id}`)}
+            onClick={() => router.push(`/profile/${post.author}`)}
           >
-            <img src={post.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'} alt={`${post.user.username}'s avatar`} />
+            <img src={post.user.pfpLink || 'https://randomuser.me/api/portraits/lego/1.jpg'} alt={`${post.user.username}'s avatar`} />
           </div>
           <div className={styles.postContent}>
             <div className={styles.postHeader}>
               <span 
                 className={styles.postUsername}
-                onClick={() => router.push(`/profile/${post.user.id}`)}
+                onClick={() => router.push(`/profile/${post.author}`)}
               >{post.user.username}</span>
               <span className={styles.postHandle}>{post.handle}</span>
               <span className={styles.postTime}>· {post.time}</span>
@@ -258,7 +260,7 @@ export default function PostPage({ params }: { params: { id: string } }) {
             post.comments.comments.map((comment, index) => (
               <div key={index} className={styles.comment}>
                 <div className={styles.commentAvatar}>
-                  <img src={post.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'} alt="User avatar" />
+                  <img src={post.user.pfpLink || 'https://randomuser.me/api/portraits/lego/1.jpg'} alt="User avatar" />
                 </div>
                 <div className={styles.commentContent}>
                   <div className={styles.commentHeader}>

@@ -2,7 +2,7 @@ http://localhost:3000/block-number
 
 ###
 
-http://localhost:3000/chain-social/user/0x4c2E0165CA1123608CFf84f7805B6C57Be9C3813
+http://localhost:3000/chain-social/user/0x9c0D4EC32821BC7802233614eF26C8c658cbB605
 
 ###
 
@@ -58,3 +58,5 @@ Content-Type: application/json
   "userAddress": "0x6d12ac7A0cCcB9deC218C832e7c6De4CCe8B9d3c",
   "user": "0x4c2E0165CA1123608CFf84f7805B6C57Be9C3813"
 }
+###
+GET http://localhost:3000/data/following-posts/0x4c2E0165CA1123608CFf84f7805B6C57Be9C3813

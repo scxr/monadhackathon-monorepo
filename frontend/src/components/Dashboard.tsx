@@ -29,6 +29,7 @@ interface Post {
     username: string;
     id: string;
     address: string;
+    pfpLink: string;
   }
   likes: {
     likeCount: number;
@@ -57,6 +58,7 @@ export function Dashboard() {
   const [userData, setUserData] = useState<any>(null);
   const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
+  const [feedType, setFeedType] = useState<'all' | 'following'>('all');
   const postIdsRef = useRef<Set<string>>(new Set());
   const loadingRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -92,9 +94,18 @@ export function Dashboard() {
     setIsLoading(true);
     
     try {
-      const response = await fetch(`/api/get-posts?offset=${currentOffset}&limit=${POSTS_PER_PAGE}`);
+      let url = `/api/get-posts?offset=${currentOffset}&limit=${POSTS_PER_PAGE}`;
+      
+      // If feed type is 'following', use the following posts endpoint
+      if (feedType === 'following' && activeWallet) {
+        url = `/api/get-following-posts?offset=${currentOffset}&limit=${POSTS_PER_PAGE}&address=${activeWallet.address}`;
+      }
+      
+      console.log(`Fetching posts from: ${url}`);
+      const response = await fetch(url);
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch posts');
+        throw new Error(`Failed to fetch ${feedType} posts`);
       }
       
       const data = await response.json();
@@ -138,15 +149,15 @@ export function Dashboard() {
     }
   };
 
-  // Reset posts when component mounts
+  // Reset posts when component mounts or feed type changes
   useEffect(() => {
-    // Clear existing posts and IDs when component mounts
+    // Clear existing posts and IDs when component mounts or feed type changes
     setPosts([]);
     postIdsRef.current = new Set();
     setOffset(0);
     setHasMore(true);
     fetchPosts(0);
-  }, []);
+  }, [feedType]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -183,7 +194,7 @@ export function Dashboard() {
       },
       { 
         threshold: 0.1,
-        rootMargin: '100px'
+        rootMargin: '200px'
       }
     );
 
@@ -629,7 +640,7 @@ export function Dashboard() {
                   {userData?.user?.username || 'nemo'}
                 </div>
                 <div className={styles.userAddress}>
-                  {activeWallet ? `${activeWallet.address.substring(0, 6)}...${activeWallet.address.substring(activeWallet.address.length - 4)}` : '0xD4D...604B'}
+                  <a href={`https://testnet.monadexplorer.com/address/${activeWallet.address}`} target="_blank" rel="noopener noreferrer">{activeWallet ? `${activeWallet.address.substring(0, 6)}...${activeWallet.address.substring(activeWallet.address.length - 4)}` : '0xD4D...604B'}</a>
                 </div>
               </div>
             </div>
@@ -644,10 +655,7 @@ export function Dashboard() {
             {/* Post Input */}
             <div className={styles.userInputArea}>
               <div className={styles.userAvatar}>
-                <img 
-                  src={userData?.user?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'} 
-                  alt="Your avatar" 
-                />
+                <img src={userData?.user?.pfpLink || 'https://randomuser.me/api/portraits/lego/1.jpg'} alt="User avatar" />
               </div>
               <div className={styles.inputWrapper}>
                 <textarea 
@@ -675,8 +683,31 @@ export function Dashboard() {
               </div>
             </div>
 
+            {/* Feed Toggle */}
+            <div className={styles.feedToggle}>
+              <button 
+                className={`${styles.toggleButton} ${feedType === 'all' ? styles.active : ''}`}
+                onClick={() => setFeedType('all')}
+              >
+                All
+              </button>
+              <button 
+                className={`${styles.toggleButton} ${feedType === 'following' ? styles.active : ''}`}
+                onClick={() => setFeedType('following')}
+              >
+                Following
+              </button>
+            </div>
+
             {/* Feed */}
             <div className={styles.feed}>
+              {posts.length === 0 && !isLoading && (
+                <div className={styles.noPostsMessage}>
+                  {feedType === 'following' 
+                    ? "You're not following anyone yet, or the people you follow haven't posted anything." 
+                    : "No posts to show. Be the first to post!"}
+                </div>
+              )}
               {posts.map(post => {
                 const ethAddress = containsEthereumAddress(post.content);
                 
@@ -688,7 +719,7 @@ export function Dashboard() {
                         e.stopPropagation();
                         router.push(`/profile/${post.author}`);
                       }}>
-                        <img src={post.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'} alt={`${post.user.username}'s avatar`} />
+                        <img src={post.user.pfpLink == "https://placeholder.com" ? "https://randomuser.me/api/portraits/lego/1.jpg" : post.user.pfpLink || 'https://randomuser.me/api/portraits/lego/1.jpg'} alt={`${post.user.username}'s avatar`} />
                       </div>
                       <div className={styles.postContent}>
                         <div className={styles.postHeader}>
@@ -732,10 +763,7 @@ export function Dashboard() {
                             e.preventDefault();
                             e.stopPropagation();
                           }}><FaComment /> <span>{post.comments.commentCount}</span></button>
-                          <button onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                          }}><FaRetweet /> <span>{post.reposts}</span></button>
+                          
                           <button 
                             onClick={(e) => {
                               e.preventDefault();
@@ -749,6 +777,10 @@ export function Dashboard() {
                           <button onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
+
+                            // copy link to clipboard
+                            navigator.clipboard.writeText(`${window.location.origin}/post/${post.postId}`);
+                            toast.success('Link copied to clipboard');
                           }}><FaShareSquare /></button>
                         </div>
                       </div>

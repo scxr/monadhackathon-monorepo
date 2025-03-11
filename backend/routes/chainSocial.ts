@@ -55,21 +55,41 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
   .post('/simulate/create-user', async ({ body }) => {
     try {
       // Extract parameters from request body
-      const { userAddress, username, bio, pfpLink } = body as {
+      const { userAddress, username, bio, pfpImage } = body as {
         userAddress: string;
         username: string;
         bio: string;
-        pfpLink: string;
+        pfpImage: string;
       };
+
+      // console.log("pfpImage: ", pfpImage)
+
+      let pfpLink = '';
+      if (pfpImage && pfpImage.includes('base64')) {
+        // Generate a unique filename
+        const fileName = `profile_${userAddress}_${Date.now()}.jpg`;
+        
+        // Upload the image to IPFS
+        const ipfsHash = await uploadBase64ToIPFS(pfpImage, fileName);
+        pfpLink = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
+        console.log(`Image uploaded to IPFS: ${pfpLink}`);
+        
+      } 
       
       // Validate required parameters
       if (!userAddress || !username) {
+        console.log("Missing required parameters")
         return { 
           error: 'Missing required parameters', 
           message: 'userAddress and username are required' 
         };
       }
-      
+      console.log("userAddress: ", userAddress)
+      console.log("username: ", username)
+      console.log(userAddress,
+        username,
+        bio || '',
+        pfpLink || '')
       // Simulate user creation
       const result = await chainSocialFuncs.simulateCreateUser(
         userAddress,
@@ -77,9 +97,10 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
         bio || '',
         pfpLink || ''
       );
-      
+      console.log("result: ", result)
       return result;
     } catch (error) {
+      console.error("error: ", error)
       return { error: 'Failed to simulate user creation', message: (error as Error).message };
     }
   })

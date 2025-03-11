@@ -1,6 +1,7 @@
 import { publicClient } from '../index';
 import { getContract, encodeFunctionData, decodeEventLog, type Log } from 'viem';
 import ChainSocialABI from '../abis/ChainSocial.json';
+import { userCache, FIVE_MINUTES_MS } from './cache';
 
 // Contract address for the ChainSocial contract
 const CHAIN_SOCIAL_ADDRESS = '0xB42497ACe9f353DADD5A8EF2f2Cb58176C465A95' as `0x${string}`;
@@ -90,11 +91,19 @@ export async function simulateCreateUser(userAddress: string, username: string, 
       functionName: 'createUser',
       args: [username, bio, pfpLink]
     });
+
+    let gasEstimation = await publicClient.estimateGas({
+      to: CHAIN_SOCIAL_ADDRESS,
+      data: txData,
+      account: userAddress as `0x${string}`
+    });
+
+    console.log('Gas estimation:', gasEstimation);
     
     return {
       user: simulatedUser,
       transactionData: txData,
-      estimatedGas: '0', // You could add gas estimation here if needed
+      estimatedGas: Math.ceil(Number(gasEstimation) * 1.1).toString(),
       contractAddress: CHAIN_SOCIAL_ADDRESS,
       from: userAddress
     };
@@ -170,16 +179,30 @@ const getChainSocialContract = () => {
 // Get user profile information
 export async function getUser(userAddress: string) {
   try {
+    // Check if user data is in cache
+    const cachedUser = userCache.get(userAddress);
+    if (cachedUser && cachedUser.exists) {
+
+      return cachedUser;
+    }
+
+    // If not in cache, fetch from contract
     const chainSocialContract = getChainSocialContract();
     // Use direct access to the users mapping
     const user = await chainSocialContract.read.users([userAddress as `0x${string}`]) as UserResult;
-    return {
+    
+    const userData = {
       username: user[0],
       bio: user[1],
       pfpLink: user[2],
       joinedAt: user[3].toString(), // Convert BigInt to string
       exists: user[4]
     };
+    
+    // Store in cache with 5-minute TTL
+    userCache.set(userAddress, userData, FIVE_MINUTES_MS);
+    
+    return userData;
   } catch (error) {
     console.error('Error fetching user:', error);
     throw error;
