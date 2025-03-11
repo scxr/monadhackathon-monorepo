@@ -376,7 +376,7 @@ export default function UserProfilePage({ params }: { params: { address: string 
         
         <div className={styles.profileHeader}>
           <div className={styles.coverImage}>
-            <img src="https://picsum.photos/800/200" alt="Cover" />
+            <img src="https://imgur.com/E4bgElt.png" alt="Cover" />
           </div>
           
           <div className={styles.profileInfo}>

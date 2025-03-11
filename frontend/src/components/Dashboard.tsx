@@ -665,13 +665,7 @@ export function Dashboard() {
                   maxLength={280}
                 />
                 <div className={styles.inputActions}>
-                  <div className={styles.mediaButtons}>
-                    <button type="button"><FaImage /></button>
-                    <button type="button"><FaGift /></button>
-                    <button type="button"><FaPoll /></button>
-                    <button type="button"><FaSmile /></button>
-                    <button type="button"><FaCalendar /></button>
-                  </div>
+              
                   <button 
                     onClick={handlePostSubmit}
                     className={styles.postButton}
