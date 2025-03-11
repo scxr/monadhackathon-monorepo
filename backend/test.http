@@ -35,3 +35,26 @@ Content-Type: application/json
   "content": "Hello, world!",
   "userAddress": "0x4c2e0165ca1123608cff84f7805b6c57be9c3813"
 }
+###
+GET http://localhost:3000/blockchain/token-info/0x0F0BDEbF0F83cD1EE3974779Bcb7315f9808c714
+###
+POST http://localhost:3000/transaction/trade
+Content-Type: application/json
+
+{
+  "side": "buy",
+  "amount": 1,
+  "token": "0x0F0BDEbF0F83cD1EE3974779Bcb7315f9808c714",
+  "user": "0x4c2e0165ca1123608cff84f7805b6c57be9c3813",
+  "decimals": 18
+}
+###
+GET http://localhost:3000/data/following/0x4c2E0165CA1123608CFf84f7805B6C57Be9C3813
+###
+POST http://localhost:3000/chain-social/simulate/unfollow-user
+Content-Type: application/json
+
+{
+  "userAddress": "0x6d12ac7A0cCcB9deC218C832e7c6De4CCe8B9d3c",
+  "user": "0x4c2E0165CA1123608CFf84f7805B6C57Be9C3813"
+}

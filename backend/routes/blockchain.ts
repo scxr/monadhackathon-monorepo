@@ -1,5 +1,5 @@
 import { Elysia } from 'elysia';
-import { getEthBalance, getCurrentGasPrice } from '../utils/blockchain';
+import { getEthBalance, getCurrentGasPrice, getTokenInfo } from '../utils/blockchain';
 
 // Create blockchain-related routes
 export const blockchainRoutes = new Elysia({ prefix: '/blockchain' })
@@ -25,4 +25,12 @@ export const blockchainRoutes = new Elysia({ prefix: '/blockchain' })
     } catch (error) {
       return { error: 'Failed to get gas price', message: (error as Error).message };
     }
-  }); 
+  })
+  .get('/token-info/:address', async ({ params }) => {
+    try {
+      const tokenInfo = await getTokenInfo(params.address);
+      return tokenInfo;
+    } catch (error) {
+      return { error: 'Failed to get token info', message: (error as Error).message };
+    }
+  });

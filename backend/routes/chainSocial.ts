@@ -271,4 +271,26 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
     } catch (error) {
       return { error: 'Failed to check like status', message: (error as Error).message };
     }
-  });
+  })
+
+  .get("/simulate/follow-user/:userAddress", async ({ params }) => {
+    try {
+      const { userAddress } = params as { userAddress: string };
+      const result = await chainSocialWriteFuncs.followUser(userAddress);
+      return result;
+    } catch (error) {
+      console.error(error);
+      return { error: 'Failed to simulate follow user', message: (error as Error).message };
+    }
+  })
+  .post("/simulate/unfollow-user", async ({ body }) => {
+    try {
+      const { userAddress, user } = body as { userAddress: string, user: string };
+      const result = await chainSocialWriteFuncs.unfollowUser(userAddress, user);
+      return result;
+    } catch (error) {
+      console.error(error);
+      return { error: 'Failed to simulate unfollow user', message: (error as Error).message };
+    }
+  })  
+  ;

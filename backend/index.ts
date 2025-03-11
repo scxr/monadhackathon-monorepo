@@ -7,6 +7,7 @@ import { chainSocialRoutes } from './routes/chainSocial';
 import mongoose from 'mongoose';
 import { indexerReqsRoutes } from './routes/indexerReqs';
 import {swagger} from "@elysiajs/swagger"
+import { transactRoutes } from './routes/transact';
 try {
   mongoose.connect(process.env.MONGO_URI as string);
 } catch (error) {
@@ -54,6 +55,7 @@ const app = new Elysia()
   .use(blockchainRoutes)
   .use(chainSocialRoutes)
   .use(indexerReqsRoutes)
+  .use(transactRoutes)
   .listen(3000);
 
 console.log(`🦊 Elysia server is running at ${app.server?.hostname}:${app.server?.port}`);

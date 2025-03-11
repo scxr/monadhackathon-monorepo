@@ -8,6 +8,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 
 interface Post {
   id: number;
@@ -52,9 +53,12 @@ export default function UserProfilePage({ params }: { params: { address: string 
   const [isCurrentUser, setIsCurrentUser] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [editedProfile, setEditedProfile] = useState<Partial<UserProfile>>({});
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isFollowLoading, setIsFollowLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const activeWallet = wallets[0];
   const postIdsRef = useRef<Set<string>>(new Set());
+  const {address} = useParams();
 
   // Add scroll event listener
   useEffect(() => {
@@ -82,25 +86,29 @@ export default function UserProfilePage({ params }: { params: { address: string 
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        console.log(`Fetching profile`);
+        console.log(`Fetching profile for address: ${address}`);
         setIsLoading(true);
         
         // Fetch user profile
-        const profileResponse = await fetch(`/api/profile/${params.address}`);
+        const profileResponse = await fetch(`/api/profile/${address}`);
         if (!profileResponse.ok) {
           throw new Error('Failed to fetch profile');
         }
         const profileData = await profileResponse.json();
-        console.log(`Profile data: ${profileData}`);
+        console.log(`Profile data:`, profileData);
         profileData.pfp = profileData.pfpLink;
         setUserProfile(profileData);
         
         // Fetch user posts
-        const postsResponse = await fetch(`/api/profile/${params.address}/posts`);
+        const postsResponse = await fetch(`/api/profile/${address}/posts`);
         if (!postsResponse.ok) {
           throw new Error('Failed to fetch user posts');
         }
         const postsData = await postsResponse.json();
+        console.log(`Posts data:`, postsData);
+        
+        // Reset the postIdsRef when fetching posts for a new profile
+        postIdsRef.current = new Set();
         
         const validPosts: Post[] = [];
         for (const post of postsData) {
@@ -119,6 +127,7 @@ export default function UserProfilePage({ params }: { params: { address: string 
           }
         }
         
+        console.log(`Valid posts to display:`, validPosts);
         setUserPosts(validPosts);
       } catch (error) {
         console.error('Error fetching profile data:', error);
@@ -128,8 +137,10 @@ export default function UserProfilePage({ params }: { params: { address: string 
       }
     };
 
-    fetchUserProfile();
-  }, [params.address]);
+    if (address) {
+      fetchUserProfile();
+    }
+  }, [address]);
 
   const handleLikePost = async (postId: string) => {
     if (!activeWallet) return;
@@ -203,7 +214,7 @@ export default function UserProfilePage({ params }: { params: { address: string 
     if (!activeWallet) return;
     
     try {
-      const response = await fetch(`/api/profile/${params.address}`, {
+      const response = await fetch(`/api/profile/${address}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -224,6 +235,103 @@ export default function UserProfilePage({ params }: { params: { address: string 
       toast.error('Failed to update profile');
     }
   };
+
+  const handleFollowUser = async () => {
+    if (!activeWallet) return;
+    
+    setIsFollowLoading(true);
+    try {
+      // Optimistically update UI
+      const newFollowState = !isFollowing;
+      setIsFollowing(newFollowState);
+      
+      console.log("Sending follow request for:", address, "follower:", activeWallet.address);
+      let response;
+      let text = newFollowState ? "follow" : "unfollow";
+      if (newFollowState == true) {
+      // Send request to API
+          response = await fetch(`/api/profile/${address}/follow`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ followerAddress: activeWallet.address })
+        });
+      } else {
+        response = await fetch(`/api/profile/${address}/unfollow`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ address: address, followerAddress: activeWallet.address })
+        });
+      }
+      
+      if (!response.ok) {
+        console.error("Follow request failed with status:", response.status);
+        // Revert optimistic update if request fails
+        setIsFollowing(!newFollowState);
+        throw new Error('Failed to follow user');
+      }
+      
+      const data = await response.json();
+      console.log("Follow response:", data);
+
+      const provider = await activeWallet.getEthereumProvider();
+      const txHash = await provider.request({
+        method: 'eth_sendTransaction',
+        params: [{
+          to: "0xB42497ACe9f353DADD5A8EF2f2Cb58176C465A95",
+          value: "0x0",
+          data: data.data.transactionData,
+          from: activeWallet.address,
+          gas: data.data.estimatedGas
+        }],
+      });
+      console.log("Transaction sent:", txHash);
+      const receipt = await provider.request({
+        method: 'eth_getTransactionReceipt',
+        params: [txHash]
+      });
+      console.log("Transaction receipt:", receipt);
+      
+      toast.success(`Transaction confirmed! User ${text}ed successfully`);
+    } catch (error) {
+      console.error('Error following user:', error);
+      toast.error('Failed to follow user');
+    } finally {
+      setIsFollowLoading(false);
+    }
+  };
+
+  // Check if current user is following this profile
+  useEffect(() => {
+    const checkFollowStatus = async () => {
+      if (!activeWallet || isCurrentUser) return;
+      
+      try {
+        console.log("Checking follow status for:", address, "follower:", activeWallet.address);
+        
+        // The correct URL format for the API route
+        const response = await fetch(`/api/profile/${address}/follow?followerAddress=${activeWallet.address}`);
+        
+        if (!response.ok) {
+          console.error("Follow status check failed with status:", response.status);
+          throw new Error('Failed to check follow status');
+        }
+        
+        const data = await response.json();
+        console.log("Follow status response:", data);
+        setIsFollowing(data.isFollowing);
+      } catch (error) {
+        console.error('Error checking follow status:', error);
+      }
+    };
+    
+    if (address && activeWallet) {
+      checkFollowStatus();
+    }
+  }, [activeWallet, address, isCurrentUser]);
 
   if (isLoading) {
     return (
@@ -329,6 +437,18 @@ export default function UserProfilePage({ params }: { params: { address: string 
                     Edit profile
                   </button>
                 )}
+              </div>
+            )}
+            
+            {!isCurrentUser && activeWallet && (
+              <div className={styles.profileActions}>
+                <button 
+                  onClick={handleFollowUser}
+                  className={isFollowing ? styles.unfollowButton : styles.followButton}
+                  disabled={isFollowLoading}
+                >
+                  {isFollowLoading ? 'Processing...' : (isFollowing ? 'Unfollow' : 'Follow')}
+                </button>
               </div>
             )}
           </div>

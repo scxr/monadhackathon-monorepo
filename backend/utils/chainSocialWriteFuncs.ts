@@ -5,6 +5,7 @@ import { decodeChainSocialEvents } from './chainSocialViewFuncs';
 import type { Post } from '../models/types';
 import { createPostInDb } from '../models/Posts';
 const CHAIN_SOCIAL_ADDRESS = '0xB42497ACe9f353DADD5A8EF2f2Cb58176C465A95' as `0x${string}`;
+import { getFollowing } from './indexerFuncs';
 
 const getChainSocialContract = () => {
   return getContract({
@@ -241,3 +242,75 @@ export async function updateUser(bio: string, pfpLink: string) {
     };
   }
 }
+
+export async function followUser(userAddress: string) {
+  try {
+    // const chainSocialContract = getChainSocialContract();
+    console.log(userAddress);
+    const txData = encodeFunctionData({ 
+      abi: ChainSocialABI,
+      functionName: 'followUser',
+      args: [userAddress]
+    });
+
+    const gasEstimation = await publicClient.estimateGas({
+      to: CHAIN_SOCIAL_ADDRESS,
+      data: txData,
+      account: "0x4c2E0165CA1123608CFf84f7805B6C57Be9C3813" as `0x${string}`
+    });
+
+    return {  
+      transactionData: txData,
+      estimatedGas: Math.ceil(Number(gasEstimation) * 1.1).toString(),
+      contractAddress: CHAIN_SOCIAL_ADDRESS,
+    };
+  } catch (error) {
+    console.error('Error following user:', error);  
+    return {
+      success: false,
+      error: (error as Error).message
+    };
+  }
+}
+
+export async function unfollowUser(userAddress: string, sender: string) {
+  try {
+    // const chainSocialContract = getChainSocialContract();
+    let following = await getFollowing(sender as string);
+    if (!following.following.includes(userAddress)) {
+      throw new Error('User is not following this user');
+    }
+    const txData = encodeFunctionData({
+      abi: ChainSocialABI,
+      functionName: 'unfollowUser',
+      args: [userAddress]
+    });
+
+    const gasEstimation = await publicClient.estimateGas({
+      to: CHAIN_SOCIAL_ADDRESS,
+      data: txData,
+      account: sender as `0x${string}`
+    });
+    console.log({
+      transactionData: txData,
+      estimatedGas: Math.ceil(Number(gasEstimation) * 1.1).toString(),  
+      contractAddress: CHAIN_SOCIAL_ADDRESS,
+    })
+    return {
+      transactionData: txData,
+      estimatedGas: Math.ceil(Number(gasEstimation) * 1.1).toString(),  
+      contractAddress: CHAIN_SOCIAL_ADDRESS,
+    };
+  } catch (error) {
+    console.error('Error unfollowing user:', error);
+    return {
+      success: false,
+      error: (error as Error).message
+    };
+  }
+}
+
+
+unfollowUser("0x6d12ac7A0cCcB9deC218C832e7c6De4CCe8B9d3c", "0x4c2E0165CA1123608CFf84f7805B6C57Be9C3813");
+
+  

@@ -3,7 +3,7 @@
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import styles from './Dashboard.module.css';
 import { useState, useEffect, FormEvent, useRef, useCallback } from 'react';
-import { FaHome, FaSearch, FaBell, FaEnvelope, FaBookmark, FaList, FaUser, FaEllipsisH, FaImage, FaGift, FaPoll, FaSmile, FaCalendar, FaRetweet, FaHeart, FaShareSquare, FaComment, FaEdit, FaSignOutAlt } from 'react-icons/fa';
+import { FaHome, FaSearch, FaBell, FaEnvelope, FaBookmark, FaList, FaUser, FaEllipsisH, FaImage, FaGift, FaPoll, FaSmile, FaCalendar, FaRetweet, FaHeart, FaShareSquare, FaComment, FaEdit, FaSignOutAlt, FaShoppingCart, FaInfo, FaTimes, FaSpinner } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Link from 'next/link';
@@ -36,6 +36,16 @@ interface Post {
   }
 }
 
+// Define the TokenInfo type
+interface TokenInfo {
+  supply: string;
+  parsedSupply: number;
+  decimals: number;
+  name: string;
+  symbol: string;
+  price: string;
+}
+
 export function Dashboard() {
   const { user, logout } = usePrivy();
   const { wallets } = useWallets();
@@ -52,6 +62,17 @@ export function Dashboard() {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const activeWallet = wallets[0];
   const router = useRouter();
+  const [tokenInfo, setTokenInfo] = useState<TokenInfo | null>(null);
+  const [showTokenInfo, setShowTokenInfo] = useState(false);
+  const [showBuyPopup, setShowBuyPopup] = useState(false);
+  const [infoButtonPosition, setInfoButtonPosition] = useState({ top: 0, left: 0 });
+  const [buyButtonPosition, setBuyButtonPosition] = useState({ top: 0, left: 0 });
+  const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
+  const [purchaseAmount, setPurchaseAmount] = useState("0.01");
+  const [slippage, setSlippage] = useState("10");
+  const [isPurchasing, setIsPurchasing] = useState(false);
+  const popupRef = useRef<HTMLDivElement>(null);
+  const buyPopupRef = useRef<HTMLDivElement>(null);
 
   // Add scroll event listener
   useEffect(() => {
@@ -179,6 +200,24 @@ export function Dashboard() {
     };
   }, [offset, hasMore, isLoading]);
 
+  // Close popups when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        (popupRef.current && !popupRef.current.contains(event.target as Node)) &&
+        (buyPopupRef.current && !buyPopupRef.current.contains(event.target as Node))
+      ) {
+        setShowTokenInfo(false);
+        setShowBuyPopup(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const handlePostSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!postContent.trim()) return;
@@ -297,6 +336,160 @@ export function Dashboard() {
     }
   };
 
+  // Function to check if text contains an Ethereum address
+  const containsEthereumAddress = (text: string): string | null => {
+    // Regex to match Ethereum addresses (0x followed by 40 hex characters)
+    const ethAddressRegex = /0x[a-fA-F0-9]{40}/g;
+    const match = text.match(ethAddressRegex);
+    return match ? match[0] : null;
+  };
+
+  // Function to handle buy action
+  const handleBuy = async (e: React.MouseEvent, address: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Get the position of the clicked button for positioning the popup
+    const buttonRect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    setBuyButtonPosition({
+      top: buttonRect.top + window.scrollY,
+      left: buttonRect.left + window.scrollX + (buttonRect.width / 4)
+    });
+    
+    setSelectedAddress(address);
+    setShowBuyPopup(true);
+    
+    // Reset purchase form
+    setPurchaseAmount("0.01");
+    setSlippage("10");
+    setIsPurchasing(false);
+  };
+
+  // Function to handle purchase confirmation
+  const handleConfirmPurchase = async () => {
+    if (!selectedAddress) return;
+    
+    setIsPurchasing(true);
+    
+    try {
+      // Simulate API call with 5 second delay
+      // await new Promise(resolve => setTimeout(resolve, 5000));
+
+      let response = await fetch(`/api/purchase`, {
+        method: "POST",
+        body: JSON.stringify({
+          address: selectedAddress,
+          amount: purchaseAmount,
+          userAddress: activeWallet.address
+        })
+      });
+
+      let data = await response.json();
+      console.log(data);
+
+      const provider = await activeWallet.getEthereumProvider();
+      const txHash = await provider.request({
+        method: 'eth_sendTransaction',
+        params: [{
+          to: data.data.to,
+          gas: data.data.gas,
+          gasPrice: data.data.gasPrice,
+          data: data.data.data,
+          from: activeWallet.address,
+          value: data.data.value
+        }],
+      });
+
+      console.log("Transaction sent:", txHash);
+      
+      
+      
+      // toast.success(`Successfully purchased ${purchaseAmount} MON tokens!`);
+      toast.success(
+        <div>
+          Successfully purchased {purchaseAmount} MON tokens!
+          <a 
+            href={`https://monad-testnet.socialscan.io/tx/${txHash}`} 
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ marginLeft: '5px', color: '#4caf50', textDecoration: 'underline' }}
+          >
+            See transaction
+          </a>
+        </div>,
+        {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        }
+      );
+      
+      setShowBuyPopup(false);
+    } catch (error) {
+      console.error('Error processing purchase:', error);
+      toast.error('Failed to complete purchase. Please try again.');
+    } finally {
+      setIsPurchasing(false);
+    }
+  };
+
+  // Function to close the buy popup
+  const closeBuyPopup = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowBuyPopup(false);
+  };
+
+  // Function to fetch token info
+  const fetchTokenInfo = async (address: string): Promise<TokenInfo> => {
+    // For now, return mock data as specified
+    // In a real implementation, this would make an API call to the backend
+    const response = await fetch(`/api/token-info/${address}`);
+    const data = await response.json();
+    return {
+      "supply": data.supply,
+      "parsedSupply": data.parsedSupply,
+      "decimals": data.decimals,
+      "name": data.name,
+      "symbol": data.symbol,
+      "price": data.price
+    };
+  };
+
+  // Function to handle info action
+  const handleInfo = async (e: React.MouseEvent, address: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Get the position of the clicked button for positioning the popup
+    const buttonRect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    setInfoButtonPosition({
+      top: buttonRect.top + window.scrollY,
+      left: buttonRect.left + window.scrollX + (buttonRect.width / 2)
+    });
+    
+    setSelectedAddress(address);
+    
+    try {
+      const info = await fetchTokenInfo(address);
+      setTokenInfo(info);
+      setShowTokenInfo(true);
+    } catch (error) {
+      console.error('Error fetching token info:', error);
+      toast.error('Failed to fetch token information');
+    }
+  };
+
+  // Function to close the token info popup
+  const closeTokenInfo = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowTokenInfo(false);
+  };
+
   return (
     <>
       {/* Fixed Header */}
@@ -321,6 +514,110 @@ export function Dashboard() {
 
       <div className={styles.twitterLayout}>
         <ToastContainer theme="dark" />
+        
+        {/* Token Info Popup */}
+        {showTokenInfo && tokenInfo && (
+          <div 
+            className={styles.tokenInfoPopup} 
+            style={{ 
+              top: `${infoButtonPosition.top - 220}px`, 
+              left: `${infoButtonPosition.left - 125}px` 
+            }}
+            ref={popupRef}
+          >
+            <div className={styles.tokenInfoHeader}>
+              <h3>Token Info</h3>
+              <button className={styles.closeButton} onClick={closeTokenInfo}>
+                <FaTimes />
+              </button>
+            </div>
+            <div className={styles.tokenInfoContent}>
+              <div className={styles.tokenInfoRow}>
+                <span className={styles.tokenInfoLabel}>Name:</span>
+                <span className={styles.tokenInfoValue}>{tokenInfo.name}</span>
+              </div>
+              <div className={styles.tokenInfoRow}>
+                <span className={styles.tokenInfoLabel}>Symbol:</span>
+                <span className={styles.tokenInfoValue}>{tokenInfo.symbol}</span>
+              </div>
+              <div className={styles.tokenInfoRow}>
+                <span className={styles.tokenInfoLabel}>Price:</span>
+                <span className={styles.tokenInfoValue}>${tokenInfo.price}</span>
+              </div>
+              <div className={styles.tokenInfoRow}>
+                <span className={styles.tokenInfoLabel}>Decimals:</span>
+                <span className={styles.tokenInfoValue}>{tokenInfo.decimals}</span>
+              </div>
+              <div className={styles.tokenInfoRow}>
+                <span className={styles.tokenInfoLabel}>Supply:</span>
+                <span className={styles.tokenInfoValue}>{Number(tokenInfo.parsedSupply).toLocaleString()}</span>
+              </div>
+            </div>
+            <div className={styles.tokenInfoArrow}></div>
+          </div>
+        )}
+        
+        {/* Buy Popup */}
+        {showBuyPopup && (
+          <div 
+            className={styles.buyPopup} 
+            style={{ 
+              top: `${buyButtonPosition.top - 220}px`, 
+              left: `${buyButtonPosition.left - 125}px` 
+            }}
+            ref={buyPopupRef}
+          >
+            <div className={styles.buyPopupHeader}>
+              <h3>Buy Tokens</h3>
+              <button className={styles.closeButton} onClick={closeBuyPopup}>
+                <FaTimes />
+              </button>
+            </div>
+            <div className={styles.buyPopupContent}>
+              <div className={styles.inputGroup}>
+                <label htmlFor="amount">Amount:</label>
+                <div className={styles.inputWithUnit}>
+                  <input 
+                    id="amount"
+                    type="number" 
+                    value={purchaseAmount} 
+                    onChange={(e) => setPurchaseAmount(e.target.value)}
+                    disabled={isPurchasing}
+                  />
+                  <span className={styles.inputUnit}>MON</span>
+                </div>
+              </div>
+              <div className={styles.inputGroup}>
+                <label htmlFor="slippage">Slippage:</label>
+                <div className={styles.inputWithUnit}>
+                  <input 
+                    id="slippage"
+                    type="number" 
+                    value={slippage} 
+                    onChange={(e) => setSlippage(e.target.value)}
+                    disabled={isPurchasing}
+                  />
+                  <span className={styles.inputUnit}>%</span>
+                </div>
+              </div>
+              <button 
+                className={styles.confirmButton}
+                onClick={handleConfirmPurchase}
+                disabled={isPurchasing}
+              >
+                {isPurchasing ? (
+                  <>
+                    <FaSpinner className={styles.spinner} /> 
+                    Processing...
+                  </>
+                ) : (
+                  'Confirm Purchase'
+                )}
+              </button>
+            </div>
+            <div className={styles.buyPopupArrow}></div>
+          </div>
+        )}
         
         <div className={styles.mainContainer}>
           {/* Left Column - User Info */}
@@ -380,60 +677,85 @@ export function Dashboard() {
 
             {/* Feed */}
             <div className={styles.feed}>
-              {posts.map(post => (
-                <Link href={`/post/${post.postId}`} key={post.postId} className={styles.postLink}>
-                  <div className={styles.post}>
-                    <div className={styles.postAvatar} onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      router.push(`/profile/${post.author}`);
-                    }}>
-                      <img src={post.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'} alt={`${post.user.username}'s avatar`} />
-                    </div>
-                    <div className={styles.postContent}>
-                      <div className={styles.postHeader}>
-                        <span 
-                          className={styles.postUsername}
-                          onClick={(e) => {
+              {posts.map(post => {
+                const ethAddress = containsEthereumAddress(post.content);
+                
+                return (
+                  <Link href={`/post/${post.postId}`} key={post.postId} className={styles.postLink}>
+                    <div className={styles.post}>
+                      <div className={styles.postAvatar} onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        router.push(`/profile/${post.author}`);
+                      }}>
+                        <img src={post.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'} alt={`${post.user.username}'s avatar`} />
+                      </div>
+                      <div className={styles.postContent}>
+                        <div className={styles.postHeader}>
+                          <span 
+                            className={styles.postUsername}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              router.push(`/profile/${post.author}`);
+                            }}
+                          >{post.user.username}</span>
+                          <span className={styles.postHandle}>{post.handle}</span>
+                          <span className={styles.postTime}>· {post.time}</span>
+                        </div>
+                        <div className={styles.postText}>
+                          {post.content}
+                        </div>
+                        
+                        {/* Buy and Info buttons for Ethereum addresses */}
+                        {ethAddress && (
+                          <div className={styles.actionButtonsContainer}>
+                            <button 
+                              className={styles.buyButton}
+                              onClick={(e) => handleBuy(e, ethAddress)}
+                              data-address={ethAddress}
+                            >
+                              <FaShoppingCart /> Buy
+                            </button>
+                            <button 
+                              className={styles.infoButton}
+                              onClick={(e) => handleInfo(e, ethAddress)}
+                              data-address={ethAddress}
+                            >
+                              <FaInfo /> Info
+                            </button>
+                          </div>
+                        )}
+                        
+                        <div className={styles.postActions}>
+                          <button onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            router.push(`/profile/${post.author}`);
-                          }}
-                        >{post.user.username}</span>
-                        <span className={styles.postHandle}>{post.handle}</span>
-                        <span className={styles.postTime}>· {post.time}</span>
-                      </div>
-                      <div className={styles.postText}>
-                        {post.content}
-                      </div>
-                      <div className={styles.postActions}>
-                        <button onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                        }}><FaComment /> <span>{post.comments.commentCount}</span></button>
-                        <button onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                        }}><FaRetweet /> <span>{post.reposts}</span></button>
-                        <button 
-                          onClick={(e) => {
+                          }}><FaComment /> <span>{post.comments.commentCount}</span></button>
+                          <button onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            handleLikePost(post.postId.toString());
-                          }}
-                          className={post.likes.likers.includes(activeWallet.address) ? styles.likedButton : ''}
-                        >
-                          <FaHeart /> <span>{post.likes.likeCount}</span>
-                        </button>
-                        <button onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                        }}><FaShareSquare /></button>
+                          }}><FaRetweet /> <span>{post.reposts}</span></button>
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleLikePost(post.postId.toString());
+                            }}
+                            className={post.likes.likers.includes(activeWallet.address) ? styles.likedButton : ''}
+                          >
+                            <FaHeart /> <span>{post.likes.likeCount}</span>
+                          </button>
+                          <button onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}><FaShareSquare /></button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                );
+              })}
               
               {/* Loading indicator */}
               <div ref={loadingRef} className={styles.loadingIndicator}>

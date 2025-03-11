@@ -334,6 +334,65 @@ export async function getPostById(postId: number) {
     return postWithUsers;
 }
 
+export async function getFollowing(userAddress: string) {
+    const response = await fetch(indexer_endpoint as string, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-hasura-admin-secret': 'testing'
+        },
+        body: JSON.stringify({ query: `{
+            ChainSocial_Followed(where: {follower: {_eq: "${userAddress}"}}) {
+                followed,
+                db_write_timestamp
+            }
+        }` })
+    })
+
+    const unfollowedResponse = await fetch(indexer_endpoint as string, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-hasura-admin-secret': 'testing'
+        },
+        body: JSON.stringify({ query: `{
+            ChainSocial_Unfollowed(where: {follower: {_eq: "${userAddress}"}}) {
+                followed,
+                db_write_timestamp
+            }
+        }` })
+    })
+
+    const data = await response.json();
+    const unfollowedData = await unfollowedResponse.json();
+
+    const following = data.data.ChainSocial_Followed;
+    const unfollowed = unfollowedData.data.ChainSocial_Unfollowed;
+
+    const unfollowedUsers: string[] = [];
+    const followingUsers: string[] = [];
+
+    for (const followed of following) {
+        if (unfollowed.some((unfollowed: any) => {
+            return unfollowed.followed === followed.followed && unfollowed.db_write_timestamp > followed.db_write_timestamp
+        })) {
+            unfollowedUsers.push(followed.followed);
+        } else {
+            followingUsers.push(followed.followed);
+        }
+    }
+    console.log({
+        following: followingUsers,
+        unfollowed: unfollowedUsers
+    });
+    return {
+        following: followingUsers,
+        unfollowed: unfollowedUsers
+    }
+}
+
+// getFollowing("0x4c2E0165CA1123608CFf84f7805B6C57Be9C3813");
+
 // getAllPosts();
 // getPostsByUser("0xC7A0c405DF55943E37d76B1E3c67FdD6518b26f3");
 // getPostsWithOffsetAndLimit(10, 16);

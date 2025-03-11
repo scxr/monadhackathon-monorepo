@@ -126,7 +126,7 @@
 
 .profileInfo {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   padding: 0 20px;
   margin-top: -60px; /* Increased negative margin to overlap more with cover image */
   margin-bottom: 20px;
@@ -190,10 +190,15 @@
 }
 
 .profileActions {
-  margin-top: 60px;
+  margin-top: 15px;
+  display: flex;
+  justify-content: flex-end;
+  position: absolute;
+  top: 10px;
+  right: 20px;
 }
 
-.editButton, .saveButton, .cancelButton {
+.editButton, .saveButton, .cancelButton, .followButton, .unfollowButton {
   padding: 8px 16px;
   border-radius: 20px;
   font-weight: bold;
@@ -230,6 +235,44 @@
 
 .cancelButton:hover {
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+.followButton {
+  background-color: #1d9bf0;
+  color: #fff;
+  border: none;
+  padding: 8px 20px;
+  font-size: 14px;
+  min-width: 100px;
+}
+
+.followButton:hover {
+  background-color: #1a8cd8;
+}
+
+.followButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.unfollowButton {
+  background-color: transparent;
+  color: #fff;
+  border: 1px solid #2f3336;
+  padding: 8px 20px;
+  font-size: 14px;
+  min-width: 100px;
+}
+
+.unfollowButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ff4d4d;
+  border-color: #ff4d4d;
+}
+
+.unfollowButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .profileDetails {
