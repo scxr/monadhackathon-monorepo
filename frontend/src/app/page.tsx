@@ -63,7 +63,7 @@ export default function Home() {
       <div className={styles.container}>
         <div className={styles.content}>
           <h1 className={styles.title}>
-            MonadSocial
+            ChainSocial
           </h1>
           
           <p className={styles.subtitle}>

@@ -171,7 +171,7 @@ export function OnboardingScreen() {
         body: JSON.stringify({
           walletAddress: activeWallet.address,
           username: username.trim(),
-          bio: bio.trim() || 'New MonadSocial user',
+          bio: bio.trim() || 'New ChainSocial user',
           avatar: avatarUrl || 'https://placeholder.com',
           b64image: b64image
         }),
@@ -272,7 +272,7 @@ export function OnboardingScreen() {
     <div className={styles.container}>
       <ToastContainer />
       <div className={styles.card}>
-        <h2 className={styles.title}>Welcome to MonadSocial!</h2>
+        <h2 className={styles.title}>Welcome to ChainSocial!</h2>
         
         <div className={styles.walletInfo}>
           <div className={styles.infoRow}>
@@ -306,7 +306,7 @@ export function OnboardingScreen() {
           <div className={styles.profileForm}>
             <h3>Create Your Profile</h3>
             <p className={styles.formIntro}>
-              Set up your MonadSocial profile to get started.
+              Set up your ChainSocial profile to get started.
             </p>
             
             <div className={styles.formGroup}>
