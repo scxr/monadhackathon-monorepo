@@ -2,7 +2,10 @@ import { Elysia, t } from 'elysia';
 import { getEthBalance, getCurrentGasPrice, getTokenInfo } from '../utils/blockchain';
 
 // Create blockchain-related routes
-export const blockchainRoutes = new Elysia({ prefix: '/blockchain' })
+export const blockchainRoutes = new Elysia({ 
+  prefix: '/blockchain',
+  normalize: true
+})
   .get('/balance/:address', async ({ params }) => {
     try {
       const balance = await getEthBalance(params.address);

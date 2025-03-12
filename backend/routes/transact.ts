@@ -14,21 +14,21 @@ export const transactRoutes = new Elysia({ prefix: '/transaction' })
         const transaction = await trade(side, amount, token, user, decimals);
         return transaction;
     }, {
-        response: {
-            200: t.Object({
-                transaction: t.Object({
-                    to: t.String(),
-                    data: t.String(),
-                    value: t.String(),
-                    gas: t.String(),
-                    gasPrice: t.String(),
-                })
-            }),
-            400: t.Object({
-                error: t.String(),
-                message: t.String()
-            })
-        },
+        // response: {
+        //     200: t.Object({
+        //         transaction: t.Object({
+        //             to: t.String(),
+        //             data: t.String(),
+        //             value: t.String(),
+        //             gas: t.String(),
+        //             gasPrice: t.String(),
+        //         })
+        //     }),
+        //     400: t.Object({
+        //         error: t.String(),
+        //         message: t.String()
+        //     })
+        // },
         tags: ['Transaction'],
         body: t.Object({
             side: t.String(),

@@ -5,7 +5,9 @@ import { uploadBase64ToIPFS } from '../utils/ipfs';
 import { cors } from '@elysiajs/cors';
 
 // Create ChainSocial-related routes
-export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
+export const chainSocialRoutes = new Elysia({ 
+  prefix: '/chain-social',
+})
   .use(cors({
     origin: '*', // Be more restrictive in production
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
@@ -20,20 +22,19 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
       return { error: 'Failed to get user', message: (error as Error).message };
     }
   }, {
-    response: {
-      200: t.Object({
-        user: t.Object({
-          address: t.String(),
-          username: t.String(),
-          bio: t.String(),
-          pfpLink: t.String()
-        })
-      }),
-      400: t.Object({
-        error: t.String(),
-        message: t.String()
-      })
-    },
+    // response: {
+    //   200: t.Object({
+    //     user: t.Optional(t.Object({
+    //       username: t.String(),
+    //       bio: t.String(),
+    //       pfpLink: t.String()
+    //     }))
+    //   }),
+    //   400: t.Object({
+    //     error: t.String(),
+    //     message: t.String()
+    //   })
+    // },
     tags: ['ChainSocial'],
     params: t.Object({
       address: t.String()
@@ -70,20 +71,20 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
       return { error: 'Failed to update user', message: (error as Error).message };
     }
   }, {
-    response: {
-      200: t.Object({
-        success: t.Optional(t.Boolean()),
-        estimatedGas: t.Optional(t.String()),
-        transactionData: t.Optional(t.String()),
-        contractAddress: t.Optional(t.String()),
-        error: t.Optional(t.String()),
-        pfpLink: t.Optional(t.String())
-      }),
-      400: t.Object({
-        error: t.String(),
-        message: t.String()
-      })
-    },
+    // response: {
+    //   200: t.Object({
+    //     success: t.Optional(t.Boolean()),
+    //     estimatedGas: t.Optional(t.String()),
+    //     transactionData: t.Optional(t.String()),
+    //     contractAddress: t.Optional(t.String()),
+    //     error: t.Optional(t.String()),
+    //     pfpLink: t.Optional(t.String())
+    //   }),
+    //   400: t.Object({
+    //     error: t.String(),
+    //     message: t.String()
+    //   })
+    // },
     tags: ['ChainSocial'],
     body: t.Object({
       bio: t.String(),
@@ -143,19 +144,19 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
       return { error: 'Failed to simulate user creation', message: (error as Error).message };
     }
   }, {
-    response: {
-      200: t.Object({
-        success: t.Optional(t.Boolean()),
-        estimatedGas: t.Optional(t.String()),
-        transactionData: t.Optional(t.String()),
-        contractAddress: t.Optional(t.String()),
-        error: t.Optional(t.String())
-      }),
-      400: t.Object({
-        error: t.String(),
-        message: t.String()
-      })
-    },
+    // response: {
+    //   200: t.Object({
+    //     success: t.Optional(t.Boolean()),
+    //     estimatedGas: t.Optional(t.String()),
+    //     transactionData: t.Optional(t.String()),
+    //     contractAddress: t.Optional(t.String()),
+    //     error: t.Optional(t.String())
+    //   }),
+    //   400: t.Object({
+    //     error: t.String(),
+    //     message: t.String()
+    //   })
+    // },
     tags: ['ChainSocial'],
     body: t.Object({
       userAddress: t.String(),
@@ -175,21 +176,21 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
       return { error: 'Failed to get post', message: (error as Error).message };
     }
   }, {
-    response: {
-      200: t.Object({ 
-        post: t.Object({
-          id: t.Number(),
-          author: t.String(),
-          content: t.String(),
-          timestamp: t.String(),
-          likes: t.Number()
-        })
-      }),
-      400: t.Object({
-        error: t.Optional(t.String()),
-        message: t.Optional(t.String())
-      })
-    },
+    // response: {
+    //   200: t.Object({ 
+    //     post: t.Object({
+    //       id: t.String(),
+    //       author: t.String(),
+    //       content: t.String(),
+    //       timestamp: t.String(),
+    //       likes: t.String()
+    //     })
+    //   }),
+    //   400: t.Object({
+    //     error: t.Optional(t.String()),
+    //     message: t.Optional(t.String())
+    //   })
+    // },
     tags: ['ChainSocial'],
     params: t.Object({
       id: t.String()
@@ -206,20 +207,20 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
       return { error: 'Failed to get comments', message: (error as Error).message };
     }
   }, {
-    response: {
-      200: t.Object({
-        comments: t.Array(t.Object({
-          id: t.Number(),
-          content: t.String(),
-          author: t.String(),
-          timestamp: t.String()
-        }))
-      }),
-      400: t.Object({
-        error: t.Optional(t.String()),
-        message: t.Optional(t.String())
-      })
-    },
+    // response: {
+    //   200: t.Object({
+    //     comments: t.Array(t.Object({
+    //       id: t.String(),
+    //       content: t.String(),
+    //       author: t.String(),
+    //       timestamp: t.String()
+    //     }))
+    //   }),
+    //   400: t.Object({
+    //     error: t.Optional(t.String()),
+    //     message: t.Optional(t.String())
+    //   })
+    // },
     tags: ['ChainSocial'],
     params: t.Object({
       id: t.String()
@@ -242,25 +243,25 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
       return { error: 'Failed to get user posts', message: (error as Error).message };
     }
   }, {
-    response: {
-      200: t.Object({
-        posts: t.Array(t.Object({
-          id: t.Number(),
-          content: t.String(),
-          author: t.String(),
-          timestamp: t.String(),
-          likes: t.Number()
-        })),
-        pagination: t.Object({
-          offset: t.Number(),
-          limit: t.Number()
-        })
-      }),
-      400: t.Object({
-        error: t.Optional(t.String()),
-        message: t.Optional(t.String())
-      })
-    },
+    // response: {
+    //   200: t.Object({
+    //     posts: t.Array(t.Object({
+    //       id: t.String(),
+    //       content: t.String(),
+    //       author: t.String(),
+    //       timestamp: t.String(),
+    //       likes: t.String()
+    //     })),
+    //     pagination: t.Object({
+    //       offset: t.Number(),
+    //       limit: t.Number()
+    //     })
+    //   }),
+    //   400: t.Object({
+    //     error: t.Optional(t.String()),
+    //     message: t.Optional(t.String())
+    //   })
+    // },
     tags: ['ChainSocial'],
     query: t.Object({
       offset: t.Optional(t.String()),
@@ -278,17 +279,17 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
       return { error: 'Failed to get following list', message: (error as Error).message };
     }
   }, {
-    response: {
-      200: t.Object({
-        following: t.Array(t.Object({
-          address: t.String()
-        }))
-      }),
-      400: t.Object({
-        error: t.Optional(t.String()),
-        message: t.Optional(t.String())
-      })
-    },
+    // response: {
+    //   200: t.Object({
+    //     following: t.Array(t.Object({
+    //       address: t.String()
+    //     }))
+    //   }),
+    //   400: t.Object({
+    //     error: t.Optional(t.String()),
+    //     message: t.Optional(t.String())
+    //   })
+    // },
     tags: ['ChainSocial'],
     params: t.Object({
       address: t.String()
@@ -307,15 +308,15 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
       return { error: 'Failed to check following status', message: (error as Error).message };
     }
   }, {
-    response: {
-      200: t.Object({
-        isFollowing: t.Boolean()
-      }),
-      400: t.Object({
-        error: t.Optional(t.String()),
-        message: t.Optional(t.String())
-      })
-    },
+    // response: {
+    //   200: t.Object({
+    //     isFollowing: t.Boolean()
+    //   }),
+    //   400: t.Object({
+    //     error: t.Optional(t.String()),
+    //     message: t.Optional(t.String())
+    //   })
+    // },
     tags: ['ChainSocial'],
     params: t.Object({
       follower: t.String(),
@@ -343,19 +344,19 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
       return { error: 'Failed to simulate post creation', message: (error as Error).message };
     }
   }, {
-    response: {
-      200: t.Object({
-        success: t.Optional(t.Boolean()),
-        estimatedGas: t.Optional(t.String()),
-        transactionData: t.Optional(t.String()),
-        contractAddress: t.Optional(t.String()),
-        error: t.Optional(t.String())
-      }),
-      400: t.Object({
-        error: t.String(),
-        message: t.String()
-      })
-    },
+    // response: {
+    //   200: t.Object({
+    //     success: t.Optional(t.Boolean()),
+    //     estimatedGas: t.Optional(t.String()),
+    //     transactionData: t.Optional(t.String()),
+    //     contractAddress: t.Optional(t.String()),
+    //     error: t.Optional(t.String())
+    //   }),
+    //   400: t.Object({
+    //     error: t.String(),
+    //     message: t.String()
+    //   })
+    // },
     tags: ['ChainSocial'],
     body: t.Object({
       content: t.String(),
@@ -383,19 +384,19 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
       return { error: 'Failed to simulate like post', message: (error as Error).message };
     }
   }, {
-    response: {
-      200: t.Object({
-        success: t.Optional(t.Boolean()),
-        estimatedGas: t.Optional(t.String()),
-        transactionData: t.Optional(t.String()),
-        contractAddress: t.Optional(t.String()),
-        error: t.Optional(t.String())
-      }),
-      400: t.Object({
-        error: t.String(),
-        message: t.String()
-      })
-    },
+    // response: {
+    //   200: t.Object({
+    //     success: t.Optional(t.Boolean()),
+    //     estimatedGas: t.Optional(t.String()),
+    //     transactionData: t.Optional(t.String()),
+    //     contractAddress: t.Optional(t.String()),
+    //     error: t.Optional(t.String())
+    //   }),
+    //   400: t.Object({
+    //     error: t.String(),
+    //     message: t.String()
+    //   })
+    // },
     tags: ['ChainSocial'],
     body: t.Object({
       postId: t.Number()
@@ -418,19 +419,19 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
       return { error: 'Failed to simulate add comment', message: (error as Error).message };
     }
   }, {
-    response: { 
-      200: t.Object({
-        success: t.Optional(t.Boolean()),
-        estimatedGas: t.Optional(t.String()),
-        transactionData: t.Optional(t.String()),
-        contractAddress: t.Optional(t.String()),
-        error: t.Optional(t.String())
-      }),
-      400: t.Object({
-        error: t.String(),
-        message: t.String()
-      })
-    },
+    // response: { 
+    //   200: t.Object({
+    //     success: t.Optional(t.Boolean()),
+    //     estimatedGas: t.Optional(t.String()),
+    //     transactionData: t.Optional(t.String()),
+    //     contractAddress: t.Optional(t.String()),
+    //     error: t.Optional(t.String())
+    //   }),
+    //   400: t.Object({
+    //     error: t.String(),
+    //     message: t.String()
+    //   })
+    // },
     tags: ['ChainSocial'],
     body: t.Object({
       postId: t.Number(),
@@ -466,19 +467,19 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
       return { error: 'Failed to confirm post creation', message: (error as Error).message };
     }
   }, {
-    response: {
-      200: t.Object({
-        success: t.Optional(t.Boolean()),
-        estimatedGas: t.Optional(t.String()),
-        transactionData: t.Optional(t.String()),
-        contractAddress: t.Optional(t.String()),
-        error: t.Optional(t.String())
-      }),
-      400: t.Object({
-        error: t.String(),
-        message: t.String()
-      })
-    },
+    // response: {
+    //   200: t.Object({
+    //     success: t.Optional(t.Boolean()),
+    //     estimatedGas: t.Optional(t.String()),
+    //     transactionData: t.Optional(t.String()),
+    //     contractAddress: t.Optional(t.String()),
+    //     error: t.Optional(t.String())
+    //   }),
+    //   400: t.Object({
+    //     error: t.String(),
+    //     message: t.String()
+    //   })
+    // },
     tags: ['ChainSocial'],
     body: t.Object({
       transactionHash: t.String()
@@ -494,23 +495,23 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
       return { error: 'Failed to decode events', message: (error as Error).message };
     }
   }, {
-    response: {
-      200: t.Object({
-        transactionHash: t.String(),
-        events: t.Array(
-          t.Object({
-            eventName: t.Optional(t.String()),
-            args: t.Optional(t.Any()),
-            rawLog: t.Optional(t.Any()),
-            error: t.Optional(t.String())
-          })
-        )
-      }),
-      400: t.Object({
-        error: t.String(),
-        message: t.String()
-      })  
-    },
+    // response: {
+    //   200: t.Object({
+    //     transactionHash: t.String(),
+    //     events: t.Array(
+    //       t.Object({
+    //         eventName: t.Optional(t.String()),
+    //         args: t.Optional(t.Any()),
+    //         rawLog: t.Optional(t.Any()),
+    //         error: t.Optional(t.String())
+    //       })
+    //     )
+    //   }),
+    //   400: t.Object({
+    //     error: t.String(),
+    //     message: t.String()
+    //   })  
+    // },
     tags: ['ChainSocial'],
     params: t.Object({
       txHash: t.String()
@@ -529,23 +530,23 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
       return { error: 'Failed to get events by type', message: (error as Error).message };
     }
   }, {
-    response: {
-      200: t.Object({
-        transactionHash: t.String(),
-        events: t.Array(
-          t.Object({
-            eventName: t.Optional(t.String()),
-            args: t.Optional(t.Any()),
-            rawLog: t.Optional(t.Any()),
-            error: t.Optional(t.String())
-          })
-        )
-      }),
-      400: t.Object({
-        error: t.String(),
-        message: t.String()
-      })
-    },
+    // response: {
+    //   200: t.Object({
+    //     transactionHash: t.String(),
+    //     events: t.Array(
+    //       t.Object({
+    //         eventName: t.Optional(t.String()),
+    //         args: t.Optional(t.Any()),
+    //         rawLog: t.Optional(t.Any()),
+    //         error: t.Optional(t.String())
+    //       })
+    //     )
+    //   }),
+    //   400: t.Object({
+    //     error: t.String(),
+    //     message: t.String()
+    //   })
+    // },
     tags: ['ChainSocial'],
     params: t.Object({
       txHash: t.String(),
@@ -563,15 +564,15 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
       return { error: 'Failed to check like status', message: (error as Error).message };
     }
   }, {
-    response: {
-      200: t.Object({
-        hasLiked: t.Boolean()
-      }),
-      400: t.Object({
-        error: t.String(),
-        message: t.String()
-      })
-    },
+    // response: {
+    //   200: t.Object({
+    //     hasLiked: t.Boolean()
+    //   }),
+    //   400: t.Object({
+    //     error: t.String(),
+    //     message: t.String()
+    //   })
+    // },
     tags: ['ChainSocial'],
     params: t.Object({
       postId: t.String(),
@@ -589,19 +590,19 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
       return { error: 'Failed to simulate follow user', message: (error as Error).message };
     }
   }, {
-    response: {
-      200: t.Object({
-        success: t.Optional(t.Boolean()),
-        estimatedGas: t.Optional(t.String()),
-        transactionData: t.Optional(t.String()),
-        contractAddress: t.Optional(t.String()),
-        error: t.Optional(t.String())
-      }),
-      400: t.Object({
-        error: t.String(),
-        message: t.String()
-      })
-    },
+    // response: {
+    //   200: t.Object({
+    //     success: t.Optional(t.Boolean()),
+    //     estimatedGas: t.Optional(t.String()),
+    //     transactionData: t.Optional(t.String()),
+    //     contractAddress: t.Optional(t.String()),
+    //     error: t.Optional(t.String())
+    //   }),
+    //   400: t.Object({
+    //     error: t.String(),
+    //     message: t.String()
+    //   })
+    // },
     tags: ['ChainSocial'],
     params: t.Object({
       userAddress: t.String(),
@@ -619,19 +620,19 @@ export const chainSocialRoutes = new Elysia({ prefix: '/chain-social' })
       return { error: 'Failed to simulate unfollow user', message: (error as Error).message };
     }
   }, {
-    response: {
-      200: t.Object({
-        success: t.Optional(t.Boolean()),
-        estimatedGas: t.Optional(t.String()),
-        transactionData: t.Optional(t.String()),
-        contractAddress: t.Optional(t.String()),
-        error: t.Optional(t.String())
-      }),
-      400: t.Object({
-        error: t.String(),
-        message: t.String()
-      })
-    },
+    // response: {
+    //   200: t.Object({
+    //     success: t.Optional(t.Boolean()),
+    //     estimatedGas: t.Optional(t.String()),
+    //     transactionData: t.Optional(t.String()),
+    //     contractAddress: t.Optional(t.String()),
+    //     error: t.Optional(t.String())
+    //   }),
+    //   400: t.Object({
+    //     error: t.String(),
+    //     message: t.String()
+    //   })
+    // },
     tags: ['ChainSocial'],
     body: t.Object({
       userAddress: t.String(),
