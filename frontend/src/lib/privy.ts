@@ -26,8 +26,8 @@ const monadChain: Chain = {
 export const privyConfig = {
   loginMethods: ['email'] as ['email'],
   appearance: {
-    theme: 'light' as const,
-    accentColor: '#676FFF' as `#${string}`,
+    theme: 'dark' as const,
+    accentColor: '#2A0134' as `#${string}`,
     showWalletLoginFirst: false,
   },
   defaultChain: monadChain,
