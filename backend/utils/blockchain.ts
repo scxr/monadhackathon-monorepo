@@ -54,7 +54,7 @@ export async function getTokenInfo(tokenAddress: string) {
   ]);
   let parsedSupply = Number(supply) / 1e6;
   let price = await getTokenPriceFromApi(tokenAddress, decimals);
-  return { supply,parsedSupply, decimals, name, symbol, price };
+  return { supply, parsedSupply, decimals, name, symbol, price: price.toString() };
 }
 
 

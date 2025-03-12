@@ -46,12 +46,33 @@ export const publicClient = createPublicClient({
 
 // Create an Elysia app
 const app = new Elysia()
-  .use(swagger())
-  .get('/', () => 'Hello from Elysia with Viem!')
-  .get('/block-number', async () => {
-    const blockNumber = await publicClient.getBlockNumber();
-    return { blockNumber: blockNumber.toString() };
-  })
+  .use(swagger({
+    documentation: {
+      tags: [
+        {
+          name: 'Blockchain',
+          description: 'Blockchain related endpoints'
+        },
+        {
+          name: 'ChainSocial',
+          description: 'ChainSocial related endpoints'
+        },
+        {
+          name: 'IndexerReqs',
+          description: 'IndexerReqs related endpoints'
+        },
+        {
+          name: 'Transact',
+          description: 'Transaction related endpoints'
+        }
+      ]
+    }
+  }))
+  // .get('/', () => 'Hello from Elysia with Viem!')
+  // .get('/block-number', async () => {
+  //   const blockNumber = await publicClient.getBlockNumber();
+  //   return { blockNumber: blockNumber.toString() };
+  // })
   .use(blockchainRoutes)
   .use(chainSocialRoutes)
   .use(indexerReqsRoutes)
