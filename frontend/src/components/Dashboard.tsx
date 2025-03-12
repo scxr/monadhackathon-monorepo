@@ -785,7 +785,7 @@ export function Dashboard() {
               
               {/* Loading indicator */}
               <div ref={loadingRef} className={styles.loadingIndicator}>
-                {isLoading && <div className={styles.spinner}>Loading...</div>}
+                {isLoading && <div className={styles.spinner}></div>}
                 {!hasMore && <div className={styles.noMorePosts}>No more posts</div>}
               </div>
             </div>

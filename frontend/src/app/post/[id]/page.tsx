@@ -148,7 +148,7 @@ export default function PostPage({ params }: { params: { id: string } }) {
   if (!post) {
     return (
       <div className={styles.container}>
-        <div className={styles.loading}>Loading...</div>
+        <div className={styles.loading}></div>
       </div>
     );
   }
