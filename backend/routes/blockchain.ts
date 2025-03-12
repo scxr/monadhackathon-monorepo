@@ -61,27 +61,27 @@ export const blockchainRoutes = new Elysia({
   .get('/token-info/:address', async ({ params }) => {
     try {
       const tokenInfo = await getTokenInfo(params.address);
-      return { tokenInfo };
+      return tokenInfo ;
     } catch (error) {
       return { error: 'Failed to get token info', message: (error as Error).message };
     }
   }, {
-    response: {
-      200: t.Object({
-        tokenInfo: t.Object({
-          supply: t.BigInt(),
-          parsedSupply: t.Number(),
-          decimals: t.Number(),
-          name: t.String(),
-          symbol: t.String(),
-          price: t.String()
-        })
-      }),
-      400: t.Object({
-        error: t.String(),
-        message: t.String()
-      })
-    },
+    // response: {
+    //   200: t.Object({
+    //     tokenInfo: t.Object({
+    //       supply: t.BigInt(),
+    //       parsedSupply: t.Number(),
+    //       decimals: t.Number(),
+    //       name: t.String(),
+    //       symbol: t.String(),
+    //       price: t.String()
+    //     })
+    //   }),
+    //   400: t.Object({
+    //     error: t.String(),
+    //     message: t.String()
+    //   })
+    // },
     tags: ['Blockchain'],
     params: t.Object({
       address: t.String()
