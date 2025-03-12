@@ -219,7 +219,7 @@ export default function PostPage({ params }: { params: { id: string } }) {
         <div className={styles.commentInput}>
           <div className={styles.userAvatar}>
             <img 
-              src={userData?.user?.avatar || 'https://randomuser.me/api/portraits/lego/1.jpg'} 
+              src={userData?.user?.pfpLink || 'https://randomuser.me/api/portraits/lego/1.jpg'} 
               alt="Your avatar" 
             />
           </div>
