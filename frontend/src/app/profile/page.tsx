@@ -38,6 +38,7 @@ interface UserProfile {
   bio: string;
   joinDate: string;
   postCount: number;
+  pfpLink: string;
 }
 
 interface EditedProfile extends Partial<UserProfile> {
@@ -291,7 +292,7 @@ export default function ProfilePage() {
         
         <div className={styles.profileHeader}>
           <div className={styles.coverImage}>
-            <img src="https://picsum.photos/800/200" alt="Cover" />
+            <img src="https://imgur.com/E4bgElt.png" alt="Cover" />
           </div>
           
           <div className={styles.profileInfo}>
@@ -396,11 +397,11 @@ export default function ProfilePage() {
               <Link href={`/post/${post.postId}`} key={post.postId} className={styles.postLink}>
                 <div className={styles.post}>
                   <div className={styles.postAvatar}>
-                    <img src={post.avatar || userProfile?.pfp || 'https://randomuser.me/api/portraits/lego/1.jpg'} alt={`${post.user.username}'s avatar`} />
+                    <img src={post.avatar || userProfile?.pfpLink || 'https://randomuser.me/api/portraits/lego/1.jpg'} alt={`${post.user?.username}'s avatar`} />
                   </div>
                   <div className={styles.postContent}>
                     <div className={styles.postHeader}>
-                      <span className={styles.postUsername}>{post.user.username}</span>
+                      <span className={styles.postUsername}>{userProfile?.username}</span>
                       <span className={styles.postHandle}>{post.handle}</span>
                       <span className={styles.postTime}>· {post.time}</span>
                     </div>
