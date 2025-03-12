@@ -35,10 +35,10 @@ export const chainSocialRoutes = new Elysia({
     //     message: t.String()
     //   })
     // },
-    tags: ['ChainSocial'],
-    params: t.Object({
-      address: t.String()
-    })
+    // tags: ['ChainSocial'],
+    // params: t.Object({
+    //   address: t.String()
+    // })
   })
 
   .put('/user/:address', async ({ params, body }) => {
@@ -85,11 +85,11 @@ export const chainSocialRoutes = new Elysia({
     //     message: t.String()
     //   })
     // },
-    tags: ['ChainSocial'],
-    body: t.Object({
-      bio: t.String(),
-      pfpImage: t.Optional(t.String())
-    })
+    // tags: ['ChainSocial'],
+    // body: t.Object({
+    //   bio: t.String(),
+    //   pfpImage: t.Optional(t.String())
+    // })
   })
 
   .post('/simulate/create-user', async ({ body }) => {
@@ -157,13 +157,13 @@ export const chainSocialRoutes = new Elysia({
     //     message: t.String()
     //   })
     // },
-    tags: ['ChainSocial'],
-    body: t.Object({
-      userAddress: t.String(),
-      username: t.String(),
-      bio: t.String(),
-      pfpImage: t.Optional(t.String())
-    })
+    // tags: ['ChainSocial'],
+    // body: t.Object({
+    //   userAddress: t.String(),
+    //   username: t.String(),
+    //   bio: t.String(),
+    //   pfpImage: t.Optional(t.String())
+    // })
   })
 
   // Get a post by ID
@@ -191,10 +191,10 @@ export const chainSocialRoutes = new Elysia({
     //     message: t.Optional(t.String())
     //   })
     // },
-    tags: ['ChainSocial'],
-    params: t.Object({
-      id: t.String()
-    })
+    // tags: ['ChainSocial'],
+    // params: t.Object({
+    //   id: t.String()
+    // })
   })
   
   // Get comments for a post
@@ -221,17 +221,17 @@ export const chainSocialRoutes = new Elysia({
     //     message: t.Optional(t.String())
     //   })
     // },
-    tags: ['ChainSocial'],
-    params: t.Object({
-      id: t.String()
-    })
+    // tags: ['ChainSocial'],
+    // params: t.Object({
+    //   id: t.String()
+    // })
   })
   
   // Get user posts with pagination
   .get('/user/:address/posts', async ({ params, query }) => {
     try {
-      const offset = query?.offset ? parseInt(query.offset as string) : 0;
-      const limit = query?.limit ? parseInt(query.limit as string) : 10;
+      const offset = query?.offset ? parseInt(query.offset as unknown as string) : 0;
+      const limit = query?.limit ? parseInt(query.limit as unknown as string) : 10;
       
       const posts = await chainSocialFuncs.getUserPosts(params.address, offset, limit);
       
@@ -262,11 +262,14 @@ export const chainSocialRoutes = new Elysia({
     //     message: t.Optional(t.String())
     //   })
     // },
-    tags: ['ChainSocial'],
-    query: t.Object({
-      offset: t.Optional(t.String()),
-      limit: t.Optional(t.String())
-    })
+    // tags: ['ChainSocial'],
+    // query: t.Object({
+    //   offset: t.Number()  ,
+    //   limit: t.Number()
+    // }),
+    // params: t.Object({
+    //   address: t.String()
+    // })
   })
   
 
@@ -290,10 +293,10 @@ export const chainSocialRoutes = new Elysia({
     //     message: t.Optional(t.String())
     //   })
     // },
-    tags: ['ChainSocial'],
-    params: t.Object({
-      address: t.String()
-    })
+    // tags: ['ChainSocial'],
+    // params: t.Object({
+    //   address: t.String()
+    // })
   })
   
   // Check if user is following another user
@@ -317,11 +320,11 @@ export const chainSocialRoutes = new Elysia({
     //     message: t.Optional(t.String())
     //   })
     // },
-    tags: ['ChainSocial'],
-    params: t.Object({
-      follower: t.String(),
-      followed: t.String()
-    })
+    // tags: ['ChainSocial'],
+    // params: t.Object({
+    //   follower: t.String(),
+    //   followed: t.String()
+    // })
   })
   
   // Simulate post creation
@@ -357,11 +360,11 @@ export const chainSocialRoutes = new Elysia({
     //     message: t.String()
     //   })
     // },
-    tags: ['ChainSocial'],
-    body: t.Object({
-      content: t.String(),
-      userAddress: t.String()
-    })
+    // tags: ['ChainSocial'],
+    // body: t.Object({
+    //   content: t.String(),
+    //   userAddress: t.String()
+    // })
   })
   .post('/simulate/like-post', async ({ body }) => {
     console.log("hi")
@@ -397,10 +400,10 @@ export const chainSocialRoutes = new Elysia({
     //     message: t.String()
     //   })
     // },
-    tags: ['ChainSocial'],
-    body: t.Object({
-      postId: t.Number()
-    })
+    // tags: ['ChainSocial'],
+    // body: t.Object({
+    //   postId: t.Number()
+    // })
   })
   .post('/simulate/add-comment', async ({ body }) => {
     try {
@@ -432,11 +435,11 @@ export const chainSocialRoutes = new Elysia({
     //     message: t.String()
     //   })
     // },
-    tags: ['ChainSocial'],
-    body: t.Object({
-      postId: t.Number(),
-      content: t.String()
-    })
+    // tags: ['ChainSocial'],
+    // body: t.Object({
+    //   postId: t.Number(),
+    //   content: t.String()
+    // })
   })
   // Confirm post creation and decode events
   .post("/confirm/create-post", async ({ body }) => {
@@ -480,10 +483,10 @@ export const chainSocialRoutes = new Elysia({
     //     message: t.String()
     //   })
     // },
-    tags: ['ChainSocial'],
-    body: t.Object({
-      transactionHash: t.String()
-    })
+    // tags: ['ChainSocial'],
+    // body: t.Object({
+    //   transactionHash: t.String()
+    // })
   })
   
   // Decode all events from a transaction
@@ -512,10 +515,10 @@ export const chainSocialRoutes = new Elysia({
     //     message: t.String()
     //   })  
     // },
-    tags: ['ChainSocial'],
-    params: t.Object({
-      txHash: t.String()
-    })
+    // tags: ['ChainSocial'],
+    // params: t.Object({
+    //   txHash: t.String()
+    // })
   })
   
   // Get events of a specific type from a transaction
@@ -547,11 +550,11 @@ export const chainSocialRoutes = new Elysia({
     //     message: t.String()
     //   })
     // },
-    tags: ['ChainSocial'],
-    params: t.Object({
-      txHash: t.String(),
-      eventName: t.String()
-    })
+    // tags: ['ChainSocial'],
+    // params: t.Object({
+    //   txHash: t.String(),
+    //   eventName: t.String()
+    // })
   })
   
   // Check if user has liked a post
@@ -573,11 +576,11 @@ export const chainSocialRoutes = new Elysia({
     //     message: t.String()
     //   })
     // },
-    tags: ['ChainSocial'],
-    params: t.Object({
-      postId: t.String(),
-      address: t.String()
-    })
+    // tags: ['ChainSocial'],
+    // params: t.Object({
+    //   postId: t.String(),
+    //   address: t.String()
+    // })
   })
 
   .get("/simulate/follow-user/:userAddress", async ({ params }) => {
@@ -603,11 +606,10 @@ export const chainSocialRoutes = new Elysia({
     //     message: t.String()
     //   })
     // },
-    tags: ['ChainSocial'],
-    params: t.Object({
-      userAddress: t.String(),
-      postId: t.String()
-    })
+    // tags: ['ChainSocial'],
+    // params: t.Object({
+    //   userAddress: t.String(),
+    // })
   })
   
   .post("/simulate/unfollow-user", async ({ body }) => {
@@ -633,10 +635,10 @@ export const chainSocialRoutes = new Elysia({
     //     message: t.String()
     //   })
     // },
-    tags: ['ChainSocial'],
-    body: t.Object({
-      userAddress: t.String(),
-      user: t.String()
-    })
+    // tags: ['ChainSocial'],
+    // body: t.Object({
+    //   userAddress: t.String(),
+    //   user: t.String()
+    // })
   })  
   ;

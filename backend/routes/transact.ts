@@ -29,13 +29,13 @@ export const transactRoutes = new Elysia({ prefix: '/transaction' })
         //         message: t.String()
         //     })
         // },
-        tags: ['Transaction'],
-        body: t.Object({
-            side: t.String(),
-            amount: t.Number(),
-            token: t.String(),
-            user: t.String(),
-            decimals: t.Optional(t.Number())
-        })
+        // tags: ['Transaction'],
+        // body: t.Object({
+        //     side: t.String(),
+        //     amount: t.Number(),
+        //     token: t.String(),
+        //     user: t.String(),
+        //     decimals: t.Optional(t.Number())
+        // })
     });
     

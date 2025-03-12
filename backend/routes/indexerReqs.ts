@@ -50,10 +50,10 @@ export const indexerReqsRoutes = new Elysia({
         //         message: t.String()
         //     })
         // },
-        tags: ['IndexerReqs'],
-        params: t.Object({
-            address: t.String()
-        })
+        // tags: ['IndexerReqs'],
+        // params: t.Object({
+        //     address: t.String()
+        // })
     })
     .get('/posts-with-offset-and-limit/:offset/:limit', async ({ params }) => {
         return await indexerReqs.getPostsWithOffsetAndLimit(Number(params.offset), Number(params.limit));
@@ -73,11 +73,11 @@ export const indexerReqsRoutes = new Elysia({
         //         message: t.String()
         //     })
         // },
-        tags: ['IndexerReqs'],
-        params: t.Object({
-            offset: t.String(),
-            limit: t.String()
-        })
+        // tags: ['IndexerReqs'],
+        // params: t.Object({
+        //     offset: t.String(),
+        //     limit: t.String()
+        // })
     })
     .get('/post/:id', async ({ params }) => {
         return await indexerReqs.getPostById(Number(params.id));
@@ -97,10 +97,10 @@ export const indexerReqsRoutes = new Elysia({
         //         message: t.String()
         //     })
         // },
-        tags: ['IndexerReqs'],
-        params: t.Object({
-            id: t.String()
-        })
+        // tags: ['IndexerReqs'],
+        // params: t.Object({
+        //     id: t.String()
+        // })
     })
     .get('/following/:address', async ({ params }) => {
         const result = await indexerReqs.getFollowing(params.address);
@@ -109,24 +109,24 @@ export const indexerReqsRoutes = new Elysia({
             unfollowed: result.unfollowed.map(address => ({ address }))
         };
     }, {
-        response: {
-            200: t.Object({
-                following: t.Array(t.Object({
-                    address: t.String()
-                })),
-                unfollowed: t.Array(t.Object({
-                    address: t.String()
-                }))
-            }),
-            400: t.Object({
-                error: t.String(),
-                message: t.String()
-            })
-        },
-        tags: ['IndexerReqs'],
-        params: t.Object({
-            address: t.String()
-        })
+        // response: {
+        //     200: t.Object({
+        //         following: t.Array(t.Object({
+        //             address: t.String()
+        //         })),
+        //         unfollowed: t.Array(t.Object({
+        //             address: t.String()
+        //         }))
+        //     }),
+        //     400: t.Object({
+        //         error: t.String(),
+        //         message: t.String()
+        //     })
+        // },
+        // tags: ['IndexerReqs'],
+        // params: t.Object({
+        //     address: t.String()
+        // })
     })
     .get('/following-posts/:address', async ({ params }) => {
         return await indexerReqs.getFollowingPosts(params.address);
@@ -146,10 +146,10 @@ export const indexerReqsRoutes = new Elysia({
         //         message: t.String()
         //     })
         // },
-        tags: ['IndexerReqs'],
-        params: t.Object({
-            address: t.String()
-        })
+        // tags: ['IndexerReqs'],
+        // params: t.Object({
+        //     address: t.String()
+        // })
     })
     .get('/user-posts/:address', async ({ params }) => {
         return await indexerReqs.getUserPosts(params.address);
@@ -169,9 +169,9 @@ export const indexerReqsRoutes = new Elysia({
         //         message: t.String()
         //     })
         // },
-        tags: ['IndexerReqs'],
-        params: t.Object({
-            address: t.String()
-        })
+        // tags: ['IndexerReqs'],
+        // params: t.Object({
+        //     address: t.String()
+        // })
     });
 
