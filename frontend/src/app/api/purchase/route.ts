@@ -6,7 +6,7 @@ export async function POST(request: Request) {
 
   // Simulate API call with 5 second delay
 //   await new Promise(resolve => setTimeout(resolve, 5000));  
-    let response = await fetch(`http://spirited-nourishment-production-8fb5.up.railway.app/transaction/trade`, {
+    let response = await fetch(`https://spirited-nourishment-production-8fb5.up.railway.app/transaction/trade`, {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'

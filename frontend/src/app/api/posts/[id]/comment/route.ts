@@ -10,7 +10,7 @@ export async function POST(
 
     console.log(`Making comment on post ${postId} with content ${content}`);
 
-    let comment = await fetch(`http://spirited-nourishment-production-8fb5.up.railway.app/chain-social/simulate/add-comment`, {
+    let comment = await fetch(`https://spirited-nourishment-production-8fb5.up.railway.app/chain-social/simulate/add-comment`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

@@ -11,7 +11,7 @@ export async function GET(
     // const address = params.address.toLowerCase();
     const {address} = await params;
 
-    let response = await fetch(`http://spirited-nourishment-production-8fb5.up.railway.app/chain-social/user/${address}`);
+    let response = await fetch(`https://spirited-nourishment-production-8fb5.up.railway.app/chain-social/user/${address}`);
     let data = await response.json();
   
     console.log(data);
@@ -47,7 +47,7 @@ export async function PUT(
     }
     
     // Send the update to your API
-    const response = await fetch(`http://spirited-nourishment-production-8fb5.up.railway.app/chain-social/user/${address}`, {
+    const response = await fetch(`https://spirited-nourishment-production-8fb5.up.railway.app/chain-social/user/${address}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'

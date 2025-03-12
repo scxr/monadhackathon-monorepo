@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     }
     
     // Forward the request to your localhost API
-    const response = await fetch(`http://spirited-nourishment-production-8fb5.up.railway.app/chain-social/simulate/create-user`, {
+    const response = await fetch(`https://spirited-nourishment-production-8fb5.up.railway.app/chain-social/simulate/create-user`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

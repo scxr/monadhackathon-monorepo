@@ -14,7 +14,7 @@ pnpm dev
 bun dev
 ```
 
-Open [http://spirited-nourishment-production-8fb5.up.railway.app](http://spirited-nourishment-production-8fb5.up.railway.app) with your browser to see the result.
+Open [https://spirited-nourishment-production-8fb5.up.railway.app](https://spirited-nourishment-production-8fb5.up.railway.app) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

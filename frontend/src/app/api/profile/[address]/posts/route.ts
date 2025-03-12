@@ -8,7 +8,7 @@ export async function GET(
     const {address} = await params;
     
     // Generate mock posts for this user
-    let posts = await fetch(`http://spirited-nourishment-production-8fb5.up.railway.app/data/user-posts/${address}`);
+    let posts = await fetch(`https://spirited-nourishment-production-8fb5.up.railway.app/data/user-posts/${address}`);
     let data = await posts.json();
     return NextResponse.json(data);
   } catch (error) {
