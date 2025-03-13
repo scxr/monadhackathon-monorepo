@@ -4,16 +4,18 @@ import * as chainSocialWriteFuncs from '../utils/chainSocialWriteFuncs';
 import { uploadBase64ToIPFS } from '../utils/ipfs';
 import { cors } from '@elysiajs/cors';
 
-// Create ChainSocial-related routes
+// Social networking API routes for on-chain social interactions
 export const chainSocialRoutes = new Elysia({ 
   prefix: '/chain-social',
 })
   .use(cors({
-    origin: '*', // Be more restrictive in production
+    origin: '*', 
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   }))
+  // Fetch user profile data by wallet address
+  // Returns username, bio, and profile picture if available
   .get('/user/:address', async ({ params }) => {
     try {
       const user = await chainSocialFuncs.getUser(params.address);
@@ -21,26 +23,10 @@ export const chainSocialRoutes = new Elysia({
     } catch (error) {
       return { error: 'Failed to get user', message: (error as Error).message };
     }
-  }, {
-    // response: {
-    //   200: t.Object({
-    //     user: t.Optional(t.Object({
-    //       username: t.String(),
-    //       bio: t.String(),
-    //       pfpLink: t.String()
-    //     }))
-    //   }),
-    //   400: t.Object({
-    //     error: t.String(),
-    //     message: t.String()
-    //   })
-    // },
-    // tags: ['ChainSocial'],
-    // params: t.Object({
-    //   address: t.String()
-    // })
   })
 
+  // Update user profile information
+  // Handles both text bio updates and profile picture uploads
   .put('/user/:address', async ({ params, body }) => {
     try {
       const { bio, pfpImage } = body as { bio: string; pfpImage?: string };
@@ -70,26 +56,6 @@ export const chainSocialRoutes = new Elysia({
       console.error('Error updating user:', error);
       return { error: 'Failed to update user', message: (error as Error).message };
     }
-  }, {
-    // response: {
-    //   200: t.Object({
-    //     success: t.Optional(t.Boolean()),
-    //     estimatedGas: t.Optional(t.String()),
-    //     transactionData: t.Optional(t.String()),
-    //     contractAddress: t.Optional(t.String()),
-    //     error: t.Optional(t.String()),
-    //     pfpLink: t.Optional(t.String())
-    //   }),
-    //   400: t.Object({
-    //     error: t.String(),
-    //     message: t.String()
-    //   })
-    // },
-    // tags: ['ChainSocial'],
-    // body: t.Object({
-    //   bio: t.String(),
-    //   pfpImage: t.Optional(t.String())
-    // })
   })
 
   .post('/simulate/create-user', async ({ body }) => {

@@ -1,11 +1,13 @@
 import { Elysia, t } from 'elysia';
 import { getEthBalance, getCurrentGasPrice, getTokenInfo } from '../utils/blockchain';
 
-// Create blockchain-related routes
+// Blockchain API routes for Ethereum-related functionality
 export const blockchainRoutes = new Elysia({ 
   prefix: '/blockchain',
   normalize: true
 })
+  // Get ETH balance for a specific address
+  // Returns balance in wei to avoid floating point precision issues
   .get('/balance/:address', async ({ params }) => {
     try {
       const balance = await getEthBalance(params.address);
@@ -34,6 +36,8 @@ export const blockchainRoutes = new Elysia({
       address: t.String()
     })
   })
+  // Fetch current gas price from the network
+  // Useful for estimating transaction costs
   .get('/gas-price', async () => {
     try {
       const gasPrice = await getCurrentGasPrice();
@@ -58,30 +62,16 @@ export const blockchainRoutes = new Elysia({
     tags: ['Blockchain'],
     
   })
+  // Retrieve ERC20 token information by contract address
+  // Includes supply, name, symbol, decimals and current price if available
   .get('/token-info/:address', async ({ params }) => {
     try {
       const tokenInfo = await getTokenInfo(params.address);
-      return tokenInfo ;
+      return tokenInfo;
     } catch (error) {
       return { error: 'Failed to get token info', message: (error as Error).message };
     }
   }, {
-    // response: {
-    //   200: t.Object({
-    //     tokenInfo: t.Object({
-    //       supply: t.BigInt(),
-    //       parsedSupply: t.Number(),
-    //       decimals: t.Number(),
-    //       name: t.String(),
-    //       symbol: t.String(),
-    //       price: t.String()
-    //     })
-    //   }),
-    //   400: t.Object({
-    //     error: t.String(),
-    //     message: t.String()
-    //   })
-    // },
     tags: ['Blockchain'],
     params: t.Object({
       address: t.String()

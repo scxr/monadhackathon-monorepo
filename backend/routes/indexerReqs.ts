@@ -12,6 +12,8 @@ export const indexerReqsRoutes = new Elysia({
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
     }))
+    // Get all posts from the envio database
+    // Returns all posts in the envio database
     .get('/all-posts', async () => {
         return await indexerReqs.getAllPosts();
     }, {
@@ -32,6 +34,8 @@ export const indexerReqsRoutes = new Elysia({
         // },
         tags: ['IndexerReqs']
     })
+    // Get posts by user from the envio database
+    // Returns all posts by a specific user
     .get('/posts-by-user/:address', async ({ params }) => {
         return await indexerReqs.getPostsByUser(params.address);
     }, {
@@ -55,6 +59,8 @@ export const indexerReqsRoutes = new Elysia({
         //     address: t.String()
         // })
     })
+    // Get posts with offset and limit from the envio database
+    // Returns posts with a specific offset and limit
     .get('/posts-with-offset-and-limit/:offset/:limit', async ({ params }) => {
         return await indexerReqs.getPostsWithOffsetAndLimit(Number(params.offset), Number(params.limit));
     }, {
@@ -79,6 +85,8 @@ export const indexerReqsRoutes = new Elysia({
         //     limit: t.String()
         // })
     })
+    // Get post by id from the envio database
+    // Returns a specific post by its id
     .get('/post/:id', async ({ params }) => {
         return await indexerReqs.getPostById(Number(params.id));
     }, {
@@ -102,6 +110,8 @@ export const indexerReqsRoutes = new Elysia({
         //     id: t.String()
         // })
     })
+    // Get following from the envio database
+    // Returns a list of addresses that the user is following
     .get('/following/:address', async ({ params }) => {
         const result = await indexerReqs.getFollowing(params.address);
         return {
@@ -128,6 +138,8 @@ export const indexerReqsRoutes = new Elysia({
         //     address: t.String()
         // })
     })
+    // Get following posts from the envio database
+    // Returns all posts from the users that the user is following
     .get('/following-posts/:address', async ({ params }) => {
         return await indexerReqs.getFollowingPosts(params.address);
     }, {
@@ -151,6 +163,8 @@ export const indexerReqsRoutes = new Elysia({
         //     address: t.String()
         // })
     })
+    // Get user posts from the envio database
+    // Returns all posts by a specific user
     .get('/user-posts/:address', async ({ params }) => {
         return await indexerReqs.getUserPosts(params.address);
     }, {

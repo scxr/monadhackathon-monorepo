@@ -1,6 +1,10 @@
 import { Elysia, t } from "elysia";
 import { trade } from "../utils/trading";
+
+// Transaction API routes for token trading operations
 export const transactRoutes = new Elysia({ prefix: '/transaction' })
+    // Execute token buy/sell trades
+    // Handles both buying and selling with specified token amount
     .post('/trade', async ({ body }) => {
         const { side, amount, token, user, decimals } = body as {
             side: 'buy' | 'sell';
