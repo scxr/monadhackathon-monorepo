@@ -87,7 +87,7 @@ export function OnboardingScreen() {
                     symbol: 'MONAD',
                     decimals: 18,
                   },
-                  rpcUrls: ['https://monad-testnet.g.alchemy.com/v2/JLv8UWVYg1PGGXx8yt7Q_Md4k7K0783T'],
+                  rpcUrls: ['https://few-lingering-surf.monad-testnet.quiknode.pro/d817ed51ec7bbb02b6ebbe877aa3f2fdb40f51e6/'],
                 },
               ],
             });

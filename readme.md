@@ -2,7 +2,7 @@
 
 ### What is it? 
 
-Chain social is a 100% on-chain social media platform akin to X.com, users can follow, like, comment, and post there own content along with buying/viewing tokens from within the actual platform. Everything from likes, to posts are verifiable on chain, even profile pictures are stored in ipfs and the hash is further stored in the contract too. It has been made to try and mask the onchain interactions so users dont feel the impact of chain calls with Monad helps with alot considering its blazing fast.  One method used to do this is optimistically rendering the frontend, we assume every call will succeed, in the case it doesn't its fixed but more often than not this is a good time save with no drawbacks.
+Chain social is a 100% on-chain social media platform akin to X.com, users can follow, like, comment, and post there own content along with buying/viewing tokens from within the actual platform. Everything from likes, to posts are verifiable on chain, even profile pictures are stored in ipfs and the hash is further stored in the contract too. It has been made to try and mask the onchain interactions so users dont feel the impact of chain calls, Monad helps with this alot considering its blazing fast.  An example of one method used to do this is optimistically rendering the frontend, we assume every call will succeed, in the case it doesn't its fixed but more often than not this is a good time save with no drawbacks.
 
 ### Tech stack
 
@@ -89,5 +89,3 @@ __Buy Profile__
 ![enter image description here](https://imgur.com/9pKxW6Y.png)
 
 And much more :)
-
-View demo video here: https://youtu.be/kkobCqqKGzQ
